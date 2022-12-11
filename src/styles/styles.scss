@@ -1,0 +1,29 @@
+@import "./fonts/Montserrat/montserrat.scss";
+@import "./fonts/OpenSans/opensans.scss";
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+    outline: none;
+    text-decoration: none;
+    border: none;
+
+    font-family: 'Montserrat', sans-serif;
+
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    height: 100%;
+    width: 100%;
+
+    text-rendering: optimizeSpeed;
+}
