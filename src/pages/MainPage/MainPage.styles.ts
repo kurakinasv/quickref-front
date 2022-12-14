@@ -48,6 +48,17 @@ export const NavLink = styled.span`
     }
 `;
 
+export const LinkButton = styled.button`
+    color: ${colors.darkBrown};
+    font-size: 16px;
+    font-weight: 500;
+
+    :hover {
+        text-decoration: underline;
+        cursor: pointer;
+    }
+`;
+
 export const ContentWrapper = styled.main`
     width: 90vw;
 
