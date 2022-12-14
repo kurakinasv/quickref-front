@@ -24,13 +24,16 @@
                 "endOfLine": "auto",
                 "arrowParens": "always",
                 "tabWidth": 4,
-                "semi": true
+                "semi": true,
+                "printWidth": 100,
+                "trailingComma": "es5"
             }
         ],
         "no-console": "warn",
         "jsx-quotes": ["warn", "prefer-double"],
         "simple-import-sort/imports": "error",
-        "simple-import-sort/exports": "error"
+        "simple-import-sort/exports": "error",
+        "max-len": ["warn", 100]
     },
     "settings": {
         "react":{
@@ -52,7 +55,7 @@
               // Packages `react` related packages come first.
               ["^react"],
               // Internal packages.
-              ["^(@|components)(/.*|$)"],
+              ["^\\w", "^(@|components)(/.*|$)"],
               // Side effect imports.
               ["^\\u0000"],
               // Parent imports. Put `..` last.

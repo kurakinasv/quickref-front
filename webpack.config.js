@@ -24,7 +24,13 @@ const getBabelUseOptions = (...ext) => {
     return useOpts;
 };
 
-const createAliasPath = (endpoint) => path.resolve(__dirname, `src/${endpoint}`);
+const styledComponentsOpts = () => {
+    const useOpts = getBabelUseOptions();
+    useOpts.options.plugins = ['babel-plugin-styled-components'];
+    return useOpts;
+};
+
+const createAliasPath = (endpoint) => path.resolve(__dirname, `src/${endpoint}/`);
 
 module.exports = {
     entry: './src/index.tsx',
@@ -73,6 +79,10 @@ module.exports = {
             {
                 test: /\.s[ac]ss$/i,
                 use: [MiniCssExtractPlugin.loader, 'css-loader', 'sass-loader'],
+            },
+            {
+                test: /\.styles.ts$/i,
+                use: styledComponentsOpts(),
             },
             {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,

@@ -12,7 +12,18 @@
         "jsx": "react",
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
-        "sourceMap": true
+        "sourceMap": true,
+        "baseUrl": "src/",
+        "paths": { 
+ 		    "@components/*": ["components/*"],
+ 		    "@config/*": ["config/*"],
+ 		    "@img/*": ["img/*"],
+ 		    "@pages/*": ["pages/*"],
+ 		    "@stores/*": ["stores/*"],
+			"@styles/*": ["styles/*"],
+			"@types/*": ["types/*"],
+			"@utils/*": ["utils/*"],
+		}
     },
     
     "include": ["src/**/*", "declaration.d.ts"],
