@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 
+import { observer } from 'mobx-react-lite';
+
 import { Button, Input } from '@mui/material';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
+import { useAuthStore } from '@stores/AuthStore/AuthStore.context';
 
 import {
     CategoriesContainer,
@@ -32,7 +35,8 @@ const style = {
 };
 
 const MainPage = () => {
-    const [isAuth, setIsAuth] = useState(false);
+    const { isAuthenticated, loginHandler, registerHandler, logoutHandler } = useAuthStore();
+
     const [isRegistered, setIsRegistered] = useState(true);
 
     const categoryNames = [
@@ -45,6 +49,7 @@ const MainPage = () => {
     ];
 
     const [open, setOpen] = useState(false);
+
     const handleOpen = () => {
         setOpen(true);
     };
@@ -61,12 +66,9 @@ const MainPage = () => {
     };
 
     const handleLogin = () => {
-        setIsAuth(true);
+        const { email, password } = value;
+        isRegistered ? loginHandler(email, password) : registerHandler(email, password);
         handleClose();
-    };
-
-    const handleLogout = () => {
-        setIsAuth(false);
     };
 
     const toggleForm = () => {
@@ -79,15 +81,15 @@ const MainPage = () => {
                 <Header>
                     <Logo>QuickRef</Logo>
                     <NavBar>
-                        {isAuth && (
+                        {isAuthenticated && (
                             <>
                                 <NavLink>
                                     <a href="#">Профиль</a>
                                 </NavLink>
-                                <LinkButton onClick={handleLogout}>Выйти</LinkButton>
+                                <LinkButton onClick={logoutHandler}>Выйти</LinkButton>
                             </>
                         )}
-                        {!isAuth && <LinkButton onClick={handleOpen}>Войти</LinkButton>}
+                        {!isAuthenticated && <LinkButton onClick={handleOpen}>Войти</LinkButton>}
                     </NavBar>
                 </Header>
 
@@ -152,4 +154,4 @@ const MainPage = () => {
     );
 };
 
-export default MainPage;
+export default observer(MainPage);

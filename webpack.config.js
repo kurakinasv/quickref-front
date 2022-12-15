@@ -14,6 +14,10 @@ const getBabelUseOptions = (...ext) => {
         loader: 'babel-loader',
         options: {
             presets: ['@babel/preset-env', '@babel/preset-typescript'],
+            plugins: [['@babel/plugin-proposal-class-properties']],
+            assumptions: {
+                setPublicClassFields: false,
+            },
         },
     };
 
