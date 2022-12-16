@@ -35,7 +35,8 @@ const style = {
 };
 
 const MainPage = () => {
-    const { isAuthenticated, loginHandler, registerHandler, logoutHandler } = useAuthStore();
+    const { isAuthenticated, isAdmin, loginHandler, registerHandler, logoutHandler } =
+        useAuthStore();
 
     const [isRegistered, setIsRegistered] = useState(true);
 
@@ -70,11 +71,12 @@ const MainPage = () => {
         <>
             <Container>
                 <Header>
-                    <Logo>QuickRef</Logo>
+                    <Logo to={PathsEnum.main}>QuickRef</Logo>
                     <NavBar>
                         {isAuthenticated && (
                             <>
                                 <NavLink to={PathsEnum.profile}>Профиль</NavLink>
+                                {isAdmin && <NavLink to={PathsEnum.admin}>Админ-панель</NavLink>}
                                 <LinkButton onClick={logoutHandler}>Выйти</LinkButton>
                             </>
                         )}

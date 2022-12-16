@@ -11,11 +11,12 @@ import { useAuthStore } from '@stores/AuthStore';
 export enum PathsEnum {
     main = '/',
     profile = 'profile',
+    admin = 'admin',
     refs = '/refs',
 }
 
 const Router: FC = () => {
-    const { isAuthenticated } = useAuthStore();
+    const { isAuthenticated, isAdmin } = useAuthStore();
 
     const authChildrenRoutes = isAuthenticated
         ? [
@@ -25,6 +26,16 @@ const Router: FC = () => {
               },
           ]
         : [];
+
+    const adminRoutes =
+        isAuthenticated && isAdmin
+            ? [
+                  {
+                      path: PathsEnum.admin,
+                      element: <div>admin page</div>,
+                  },
+              ]
+            : [];
 
     const router = createBrowserRouter([
         {
@@ -37,6 +48,7 @@ const Router: FC = () => {
                     element: <Categories />,
                 },
                 ...authChildrenRoutes,
+                ...adminRoutes,
             ],
         },
         {

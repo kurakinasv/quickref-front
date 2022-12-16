@@ -3,6 +3,7 @@ export const users = [
         id: '1',
         email: 'sv@gmail.com',
         password: '12345sv',
+        isAdmin: true,
     },
     {
         id: '2',
