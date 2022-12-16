@@ -1,12 +1,12 @@
 import React from 'react';
 
-import AuthStoreProvider from '@stores/AuthStore/AuthStore.context';
-import MainPage from './pages/MainPage';
+import Router from '@pages/Router';
+import { AuthStoreProvider } from '@stores/AuthStore';
 
 const App = () => {
     return (
         <AuthStoreProvider>
-            <MainPage />
+            <Router />
         </AuthStoreProvider>
     );
 };

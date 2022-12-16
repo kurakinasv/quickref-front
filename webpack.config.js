@@ -42,6 +42,7 @@ module.exports = {
         filename: getFilename('js'),
         path: path.resolve(__dirname, 'dist'),
         clean: true,
+        publicPath: '/',
     },
     resolve: {
         extensions: ['.js', '.jsx', '.ts', '.tsx'],
@@ -59,6 +60,7 @@ module.exports = {
     mode: 'development',
     devServer: {
         port: 5000,
+        historyApiFallback: true,
     },
     devtool: isDev ? 'eval' : 'hidden-source-map',
     optimization: {
