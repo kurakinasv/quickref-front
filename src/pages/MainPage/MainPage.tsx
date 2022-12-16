@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
 
@@ -10,8 +11,6 @@ import { PathsEnum } from '@pages/Router';
 import { useAuthStore } from '@stores/AuthStore';
 
 import {
-    CategoriesContainer,
-    CategoryItem,
     Container,
     ContentWrapper,
     Footer,
@@ -39,15 +38,6 @@ const MainPage = () => {
     const { isAuthenticated, loginHandler, registerHandler, logoutHandler } = useAuthStore();
 
     const [isRegistered, setIsRegistered] = useState(true);
-
-    const categoryNames = [
-        'Фигура человека',
-        'Часть тела',
-        'Животные',
-        'Природа',
-        'Архитектура',
-        'Скульптура',
-    ];
 
     const [open, setOpen] = useState(false);
 
@@ -93,13 +83,7 @@ const MainPage = () => {
                 </Header>
 
                 <ContentWrapper>
-                    <CategoriesContainer>
-                        {categoryNames.map((cat, i) => (
-                            <CategoryItem key={i + cat} to={PathsEnum.refs}>
-                                {cat}
-                            </CategoryItem>
-                        ))}
-                    </CategoriesContainer>
+                    <Outlet />
                 </ContentWrapper>
 
                 <Footer>

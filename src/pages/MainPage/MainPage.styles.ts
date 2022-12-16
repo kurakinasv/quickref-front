@@ -41,6 +41,7 @@ export const NavLink = styled(Link)`
     color: ${colors.darkBrown};
     font-size: 16px;
     font-weight: 500;
+    text-transform: uppercase;
 
     :hover {
         text-decoration: underline;
@@ -52,6 +53,7 @@ export const LinkButton = styled.button`
     color: ${colors.darkBrown};
     font-size: 16px;
     font-weight: 500;
+    text-transform: uppercase;
 
     :hover {
         text-decoration: underline;
@@ -66,32 +68,6 @@ export const ContentWrapper = styled.main`
     padding: 40px 0;
 
     flex: 1 1 auto;
-`;
-
-export const CategoriesContainer = styled.div`
-    width: 100%;
-    display: flex;
-    flex-wrap: wrap;
-`;
-
-export const CategoryItem = styled(Link)`
-    height: 30vh;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex: 1 1 33.3333%;
-
-    font-weight: 500;
-    font-size: 24px;
-    color: ${colors.lightPink};
-    text-align: center;
-    text-transform: uppercase;
-
-    border: 4px solid ${colors.dirtyPeach};
-    background-color: ${colors.darkBrown};
-
-    cursor: pointer;
 `;
 
 export const Footer = styled.footer`

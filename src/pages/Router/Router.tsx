@@ -1,22 +1,23 @@
 import React, { FC } from 'react';
-import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
 
+import Categories from '@pages/Categories/Categories';
 import MainPage from '@pages/MainPage';
 import RefsPage from '@pages/RefsPage';
 import { useAuthStore } from '@stores/AuthStore';
 
 export enum PathsEnum {
     main = '/',
+    profile = 'profile',
     refs = '/refs',
-    profile = '/profile',
 }
 
 const Router: FC = () => {
     const { isAuthenticated } = useAuthStore();
 
-    const authRoutes = isAuthenticated
+    const authChildrenRoutes = isAuthenticated
         ? [
               {
                   path: PathsEnum.profile,
@@ -30,12 +31,22 @@ const Router: FC = () => {
             path: PathsEnum.main,
             element: <MainPage />,
             errorElement: <div>An unexpected error has occured :C</div>,
+            children: [
+                {
+                    index: true,
+                    element: <Categories />,
+                },
+                ...authChildrenRoutes,
+            ],
         },
         {
             path: PathsEnum.refs,
             element: <RefsPage />,
         },
-        ...authRoutes,
+        {
+            path: '*',
+            element: <Navigate to={PathsEnum.main} replace />,
+        },
     ]);
 
     return <RouterProvider router={router} />;
