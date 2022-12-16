@@ -6,7 +6,8 @@ import { Button, Input } from '@mui/material';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
-import { useAuthStore } from '@stores/AuthStore/AuthStore.context';
+import { PathsEnum } from '@pages/Router';
+import { useAuthStore } from '@stores/AuthStore';
 
 import {
     CategoriesContainer,
@@ -83,9 +84,7 @@ const MainPage = () => {
                     <NavBar>
                         {isAuthenticated && (
                             <>
-                                <NavLink>
-                                    <a href="#">Профиль</a>
-                                </NavLink>
+                                <NavLink to={PathsEnum.profile}>Профиль</NavLink>
                                 <LinkButton onClick={logoutHandler}>Выйти</LinkButton>
                             </>
                         )}
@@ -96,7 +95,9 @@ const MainPage = () => {
                 <ContentWrapper>
                     <CategoriesContainer>
                         {categoryNames.map((cat, i) => (
-                            <CategoryItem key={i + cat}>{cat}</CategoryItem>
+                            <CategoryItem key={i + cat} to={PathsEnum.refs}>
+                                {cat}
+                            </CategoryItem>
                         ))}
                     </CategoriesContainer>
                 </ContentWrapper>

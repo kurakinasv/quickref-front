@@ -1,3 +1,5 @@
+import { Link } from 'react-router-dom';
+
 import styled from 'styled-components';
 
 import { colors } from '@styles/colors';
@@ -35,16 +37,14 @@ export const NavBar = styled.nav`
     gap: 30px;
 `;
 
-export const NavLink = styled.span`
-    & > a {
-        color: ${colors.darkBrown};
-        font-size: 16px;
-        font-weight: 500;
+export const NavLink = styled(Link)`
+    color: ${colors.darkBrown};
+    font-size: 16px;
+    font-weight: 500;
 
-        :hover {
-            text-decoration: underline;
-            cursor: pointer;
-        }
+    :hover {
+        text-decoration: underline;
+        cursor: pointer;
     }
 `;
 
@@ -74,7 +74,7 @@ export const CategoriesContainer = styled.div`
     flex-wrap: wrap;
 `;
 
-export const CategoryItem = styled.div`
+export const CategoryItem = styled(Link)`
     height: 30vh;
 
     display: flex;
