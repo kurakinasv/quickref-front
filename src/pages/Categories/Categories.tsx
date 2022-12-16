@@ -1,22 +1,14 @@
 import React, { FC } from 'react';
 
+import { categoryNames } from '@config/categories';
 import { PathsEnum } from '@pages/Router';
 
 import { CategoriesContainer, CategoryItem } from './Categories.styles';
 
 const Categories: FC = () => {
-    const categoryNames = [
-        'Фигура человека',
-        'Часть тела',
-        'Животные',
-        'Природа',
-        'Архитектура',
-        'Скульптура',
-    ];
-
     return (
         <CategoriesContainer>
-            {categoryNames.map((cat, i) => (
+            {Object.values(categoryNames).map((cat, i) => (
                 <CategoryItem key={i + cat} to={PathsEnum.refs}>
                     {cat}
                 </CategoryItem>

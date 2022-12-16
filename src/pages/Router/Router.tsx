@@ -3,6 +3,7 @@ import { createBrowserRouter, Navigate, RouterProvider } from 'react-router-dom'
 
 import { observer } from 'mobx-react-lite';
 
+import AdminPage from '@pages/AdminPage';
 import Categories from '@pages/Categories/Categories';
 import MainPage from '@pages/MainPage';
 import RefsPage from '@pages/RefsPage';
@@ -32,7 +33,7 @@ const Router: FC = () => {
             ? [
                   {
                       path: PathsEnum.admin,
-                      element: <div>admin page</div>,
+                      element: <AdminPage />,
                   },
               ]
             : [];
