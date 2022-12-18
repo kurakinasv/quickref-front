@@ -30,6 +30,7 @@ export const Header = styled.header`
 export const Logo = styled(Link)`
     font-weight: 300;
     font-size: 40px;
+    user-select: none;
 `;
 
 export const NavBar = styled.nav`

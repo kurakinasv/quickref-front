@@ -29,6 +29,7 @@ export const RightBlock = styled.div`
 export const Logo = styled.div`
     font-weight: 300;
     font-size: 30px;
+    user-select: none;
 `;
 
 export const Timer = styled.div`
@@ -50,11 +51,14 @@ export const RefImage = styled.img`
 
     width: fit-content;
     height: fit-content;
+
+    user-select: none;
 `;
 
 export const Footer = styled.footer`
     width: 100%;
     height: 120px;
+    padding: 0 10vw;
 
     position: fixed;
     bottom: 0;
@@ -62,7 +66,12 @@ export const Footer = styled.footer`
 
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
 
     background-color: rgba(${rgbValues.pastelPeach}, 0.7);
+
+    svg {
+        font-size: 5rem;
+        fill: ${colors.dirtyPeach};
+    }
 `;

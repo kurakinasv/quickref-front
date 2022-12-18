@@ -1,10 +1,11 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import refs from '@img/refs';
-import { ArrowLeft, ArrowRight, Close, InfoOutlined, Pause, PlayArrow } from '@mui/icons-material';
+import { ArrowLeft, ArrowRight, Close, InfoOutlined } from '@mui/icons-material';
 import { IconButton } from '@mui/material';
 import { PathsEnum } from '@pages/Router';
+import useTimer from './useTimer';
 
 import { Content, Footer, Header, Logo, RefImage, RightBlock, Timer } from './RefsPage.styles';
 
@@ -18,17 +19,11 @@ enum ArrowDirection {
 }
 
 const RefsPage: FC<RefsPageProps> = () => {
+    const imageAmount = Object.keys(refs).length;
+
     const navigate = useNavigate();
 
-    const [isPaused, setIsPaused] = useState(false);
-
-    const handleContinue = () => {
-        setIsPaused(false);
-    };
-
-    const handlePause = () => {
-        setIsPaused(true);
-    };
+    const { stopTimer, seconds, minutes, refNumber, setRefNumber } = useTimer();
 
     const [currentImageNum, setCurrentImageNum] = useState(0);
     const [currentImage, setCurrentImage] = useState(refs.camp);
@@ -41,9 +36,7 @@ const RefsPage: FC<RefsPageProps> = () => {
         return currentImageNum === 0 ? imgAmount - 1 : currentImageNum - 1;
     };
 
-    const changeRef = (arrowDir: ArrowDirection) => () => {
-        const imageAmount = Object.keys(refs).length;
-
+    const changeRef = (arrowDir: ArrowDirection) => {
         const currImgNum =
             arrowDir === ArrowDirection.prev
                 ? prevImageNumber(imageAmount)
@@ -55,16 +48,34 @@ const RefsPage: FC<RefsPageProps> = () => {
         setCurrentImage(currImg);
     };
 
+    const handleChangeRefClick = (arrowDir: ArrowDirection) => () => {
+        changeRef(arrowDir);
+        arrowDir === ArrowDirection.next
+            ? setRefNumber((prev) => prev + 1)
+            : setRefNumber((prev) => prev - 1);
+        stopTimer();
+    };
+
     const endSession = () => {
         navigate(PathsEnum.main);
     };
+
+    useEffect(() => {
+        if (minutes === 0 && seconds === 0 && refNumber + 1 !== imageAmount) {
+            changeRef(ArrowDirection.next);
+        }
+    }, [minutes === 0 && seconds === 0]);
 
     return (
         <div>
             <Header>
                 <Logo>QuickRef</Logo>
                 <RightBlock>
-                    <Timer>00:00</Timer>
+                    <Timer>
+                        {minutes < 10 ? '0' : ''}
+                        {minutes}:{seconds < 10 ? '0' : ''}
+                        {seconds}
+                    </Timer>
                     <IconButton size="large" sx={{ mr: 1 }}>
                         <InfoOutlined />
                     </IconButton>
@@ -77,13 +88,21 @@ const RefsPage: FC<RefsPageProps> = () => {
                 <RefImage src={currentImage} alt="ref" />
             </Content>
             <Footer>
-                <IconButton size="large" onClick={changeRef(ArrowDirection.prev)}>
+                <IconButton
+                    size="large"
+                    onClick={handleChangeRefClick(ArrowDirection.prev)}
+                    disabled={currentImageNum === 0}
+                >
                     <ArrowLeft />
                 </IconButton>
-                <IconButton size="large" onClick={isPaused ? handleContinue : handlePause}>
+                {/* <IconButton size="large" onClick={isPaused ? handleContinue : handlePause}>
                     {isPaused ? <PlayArrow /> : <Pause />}
-                </IconButton>
-                <IconButton size="large" onClick={changeRef(ArrowDirection.next)}>
+                </IconButton> */}
+                <IconButton
+                    size="large"
+                    onClick={handleChangeRefClick(ArrowDirection.next)}
+                    disabled={currentImageNum === imageAmount - 1}
+                >
                     <ArrowRight />
                 </IconButton>
             </Footer>
