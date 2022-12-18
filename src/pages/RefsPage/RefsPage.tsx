@@ -1,19 +1,34 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, MouseEvent, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
+import { observer } from 'mobx-react-lite';
 
 import useModal from '@hooks/useModal';
 import refs from '@img/refs';
 import { ArrowLeft, ArrowRight, Close, InfoOutlined } from '@mui/icons-material';
-import { Box, IconButton, Modal } from '@mui/material';
+import {
+    Box,
+    Button,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    Modal,
+    Select,
+    SelectChangeEvent,
+} from '@mui/material';
 import { PathsEnum } from '@pages/Router';
+import { useAuthStore } from '@stores/AuthStore';
 import { modalBoxStyle } from '@styles/consts';
-import { refsInfo } from './mock';
+import { collections, refsInfo } from './mock';
 import useTimer from './useTimer';
 
 import {
+    ButtonsBlock,
     Content,
     Footer,
     Header,
+    ImageBlock,
+    ImageButton,
     InfoItem,
     ItemData,
     ItemTitle,
@@ -21,6 +36,7 @@ import {
     ModalTitle,
     RefImage,
     RightBlock,
+    StyledFormControl,
     Timer,
 } from './RefsPage.styles';
 
@@ -38,7 +54,14 @@ const RefsPage: FC<RefsPageProps> = () => {
 
     const navigate = useNavigate();
 
+    const { isAuthenticated } = useAuthStore();
+
     const { open, openModal, closeModal } = useModal();
+    const {
+        open: collectionsOpen,
+        openModal: openCollectionsModal,
+        closeModal: closeCollectionsModal,
+    } = useModal();
 
     const { stopTimer, seconds, minutes, refNumber, setRefNumber } = useTimer();
 
@@ -74,6 +97,21 @@ const RefsPage: FC<RefsPageProps> = () => {
     };
 
     const endSession = () => {
+        // if images are selected and collection is not
+        if (!!selectedImages.length && !collection) {
+            console.log('Не выбрана коллекция!');
+            return;
+        }
+
+        // if collection is selected and images are not
+        if (!selectedImages.length && !!collection) {
+            console.log('Не выбраны изображения!');
+            return;
+        }
+
+        console.log('saving data...', collection, selectedImages);
+
+        closeCollectionsModal();
         navigate(PathsEnum.main);
     };
 
@@ -88,6 +126,46 @@ const RefsPage: FC<RefsPageProps> = () => {
         [currentImage]
     );
 
+    const [collection, setCollection] = useState('');
+
+    const onSelectChange = (event: SelectChangeEvent) => {
+        setCollection(event.target.value);
+    };
+
+    const [selectedImages, setSelectedImages] = useState<string[]>([]);
+
+    const selectImage = (e: MouseEvent) => {
+        const img = e.currentTarget.id.split('image-button')[0];
+
+        const isSelected = selectedImages.find((image) => image === img);
+
+        if (!isSelected) {
+            setSelectedImages((imgs) => [...imgs, img]);
+        } else {
+            const index = selectedImages.indexOf(img);
+            const deletedImg = selectedImages.splice(index, 1)[0];
+            const newArr = selectedImages.filter((img) => img !== deletedImg);
+
+            if (index > -1) {
+                setSelectedImages(newArr);
+            }
+        }
+    };
+
+    const discardChanges = () => {
+        setCollection('');
+        setSelectedImages([]);
+        closeCollectionsModal();
+    };
+
+    const handleCloseButton = () => {
+        if (isAuthenticated) {
+            openCollectionsModal();
+        } else {
+            navigate(PathsEnum.main);
+        }
+    };
+
     return (
         <>
             <Header>
@@ -101,7 +179,7 @@ const RefsPage: FC<RefsPageProps> = () => {
                     <IconButton size="large" sx={{ mr: 1 }} onClick={openModal}>
                         <InfoOutlined />
                     </IconButton>
-                    <IconButton size="large" onClick={endSession}>
+                    <IconButton size="large" onClick={handleCloseButton}>
                         <Close />
                     </IconButton>
                 </RightBlock>
@@ -129,12 +207,7 @@ const RefsPage: FC<RefsPageProps> = () => {
                 </IconButton>
             </Footer>
 
-            <Modal
-                open={open}
-                onClose={closeModal}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
+            <Modal open={open} onClose={closeModal}>
                 <>
                     <Box sx={{ ...modalBoxStyle, width: '600px', padding: '42px' }}>
                         <ModalTitle>Об изображении</ModalTitle>
@@ -156,8 +229,70 @@ const RefsPage: FC<RefsPageProps> = () => {
                     </Box>
                 </>
             </Modal>
+
+            {isAuthenticated && (
+                <Modal open={collectionsOpen} onClose={closeCollectionsModal}>
+                    <>
+                        <Box sx={{ ...modalBoxStyle, width: '900px', padding: '42px' }}>
+                            <ModalTitle>Добавить в коллекцию</ModalTitle>
+                            <IconButton
+                                size="large"
+                                onClick={closeCollectionsModal}
+                                sx={{ position: 'absolute', top: '10px', right: '10px' }}
+                            >
+                                <Close />
+                            </IconButton>
+
+                            <StyledFormControl fullWidth={true}>
+                                <InputLabel id="collection-select-label">Коллекция</InputLabel>
+                                <Select
+                                    size="small"
+                                    labelId="collection-select-label"
+                                    label="Collection"
+                                    value={collection}
+                                    onChange={onSelectChange}
+                                    variant="outlined"
+                                >
+                                    <MenuItem key="none" value="">
+                                        Не выбрано
+                                    </MenuItem>
+                                    {collections.map(({ id, name }) => (
+                                        <MenuItem key={id} value={id}>
+                                            {name}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </StyledFormControl>
+
+                            <ImageBlock>
+                                {Object.values(refs).map((ref, id) => {
+                                    const isActive = !!selectedImages.find((img) => img === ref);
+                                    return (
+                                        <ImageButton
+                                            key={ref + id}
+                                            id={ref + 'image-button'}
+                                            imgUrl={ref}
+                                            isActive={isActive}
+                                            onClick={selectImage}
+                                        />
+                                    );
+                                })}
+                            </ImageBlock>
+
+                            <ButtonsBlock>
+                                <Button onClick={discardChanges} variant="outlined">
+                                    Отмена
+                                </Button>
+                                <Button onClick={endSession} variant="contained">
+                                    Готово
+                                </Button>
+                            </ButtonsBlock>
+                        </Box>
+                    </>
+                </Modal>
+            )}
         </>
     );
 };
 
-export default RefsPage;
+export default observer(RefsPage);

@@ -1,6 +1,9 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
+import { FormControl } from '@mui/material';
 import { colors, rgbValues } from '@styles/colors';
+
+import { styled as muiStyled } from '@mui/material/styles';
 
 const headerHeight = '70px';
 
@@ -109,4 +112,49 @@ export const ItemData = styled.span`
     font-size: 24px;
     color: ${colors.darkBrown};
     font-weight: 500;
+`;
+
+export const StyledFormControl = muiStyled(FormControl)({
+    // to rise a little small sized label
+    '.css-14s5rfu-MuiFormLabel-root-MuiInputLabel-root': {
+        transform: 'translate(14px, 9px) scale(1)',
+    },
+});
+
+export const ImageBlock = styled.div`
+    width: 100%;
+    margin: 20px 0;
+
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    row-gap: 40px;
+`;
+
+export const ImageButton = styled.div<{ imgUrl: string; isActive: boolean }>`
+    max-height: 200px;
+    flex-basis: 23%;
+
+    background-image: ${({ imgUrl }) => (imgUrl ? `url(${imgUrl})` : 'none')};
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+
+    aspect-ratio: 2/3;
+    object-fit: fill;
+
+    cursor: pointer;
+
+    ${({ isActive }) =>
+        isActive &&
+        css`
+            border: 4px dashed ${colors.peach};
+            border-radius: 8px;
+        `}
+`;
+
+export const ButtonsBlock = styled.div`
+    display: flex;
+    justify-content: flex-end;
+    gap: 20px;
 `;

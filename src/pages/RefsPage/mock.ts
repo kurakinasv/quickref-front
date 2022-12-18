@@ -42,3 +42,9 @@ export const refsInfo: Record<keyof RefsType, { id: string; author: string; sour
         source: 'http://tuckedsource.com',
     },
 };
+
+export const collections = [
+    { id: '1', name: 'col1' },
+    { id: '2', name: 'col2' },
+    { id: '3', name: 'col3' },
+];
