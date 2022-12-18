@@ -1,4 +1,6 @@
-const refs = {
+export type RefsType = Record<string, string>;
+
+const refs: RefsType = {
     camp: require('./camp.jpeg'),
     cat1: require('./cat1.jpg'),
     cat2: require('./cat2.jpg'),

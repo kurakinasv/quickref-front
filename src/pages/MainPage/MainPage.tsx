@@ -3,12 +3,14 @@ import { Outlet } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
 
+import useModal from '@hooks/useModal';
 import { Button, Input } from '@mui/material';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import { PathsEnum } from '@pages/Router';
 import { useAuthStore } from '@stores/AuthStore';
+import { modalBoxStyle } from '@styles/consts';
 
 import {
     Container,
@@ -22,33 +24,13 @@ import {
     NavLink,
 } from './MainPage.styles';
 
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    borderRadius: 2,
-    boxShadow: 24,
-    p: 4,
-};
-
 const MainPage = () => {
     const { isAuthenticated, isAdmin, loginHandler, registerHandler, logoutHandler } =
         useAuthStore();
 
     const [isRegistered, setIsRegistered] = useState(true);
 
-    const [open, setOpen] = useState(false);
-
-    const handleOpen = () => {
-        setOpen(true);
-    };
-
-    const handleClose = () => {
-        setOpen(false);
-    };
+    const { open, openModal, closeModal } = useModal();
 
     const [value, setValue] = useState({ email: '', password: '' });
 
@@ -60,7 +42,7 @@ const MainPage = () => {
     const handleLogin = () => {
         const { email, password } = value;
         isRegistered ? loginHandler(email, password) : registerHandler(email, password);
-        handleClose();
+        closeModal();
     };
 
     const toggleForm = () => {
@@ -80,7 +62,7 @@ const MainPage = () => {
                                 <LinkButton onClick={logoutHandler}>Выйти</LinkButton>
                             </>
                         )}
-                        {!isAuthenticated && <LinkButton onClick={handleOpen}>Войти</LinkButton>}
+                        {!isAuthenticated && <LinkButton onClick={openModal}>Войти</LinkButton>}
                     </NavBar>
                 </Header>
 
@@ -97,12 +79,12 @@ const MainPage = () => {
 
             <Modal
                 open={open}
-                onClose={handleClose}
+                onClose={closeModal}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
                 <>
-                    <Box sx={style}>
+                    <Box sx={modalBoxStyle}>
                         <Typography id="modal-modal-title" variant="h6" component="h2">
                             {isRegistered ? 'Вход' : 'Регистрация'}
                         </Typography>

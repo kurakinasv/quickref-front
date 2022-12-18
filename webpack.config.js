@@ -49,6 +49,7 @@ module.exports = {
         alias: {
             '@components': createAliasPath('components'),
             '@config': createAliasPath('config'),
+            '@hooks': createAliasPath('hooks'),
             '@img': createAliasPath('img'),
             '@pages': createAliasPath('pages'),
             '@stores': createAliasPath('stores'),

@@ -1,13 +1,28 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+import useModal from '@hooks/useModal';
 import refs from '@img/refs';
 import { ArrowLeft, ArrowRight, Close, InfoOutlined } from '@mui/icons-material';
-import { IconButton } from '@mui/material';
+import { Box, IconButton, Modal } from '@mui/material';
 import { PathsEnum } from '@pages/Router';
+import { modalBoxStyle } from '@styles/consts';
+import { refsInfo } from './mock';
 import useTimer from './useTimer';
 
-import { Content, Footer, Header, Logo, RefImage, RightBlock, Timer } from './RefsPage.styles';
+import {
+    Content,
+    Footer,
+    Header,
+    InfoItem,
+    ItemData,
+    ItemTitle,
+    Logo,
+    ModalTitle,
+    RefImage,
+    RightBlock,
+    Timer,
+} from './RefsPage.styles';
 
 type RefsPageProps = {
     chosenCategory?: string;
@@ -22,6 +37,8 @@ const RefsPage: FC<RefsPageProps> = () => {
     const imageAmount = Object.keys(refs).length;
 
     const navigate = useNavigate();
+
+    const { open, openModal, closeModal } = useModal();
 
     const { stopTimer, seconds, minutes, refNumber, setRefNumber } = useTimer();
 
@@ -66,8 +83,13 @@ const RefsPage: FC<RefsPageProps> = () => {
         }
     }, [minutes === 0 && seconds === 0]);
 
+    const currentInfo = useMemo(
+        () => Object.entries(refsInfo)?.find(([key]) => key === currentImage)?.[1],
+        [currentImage]
+    );
+
     return (
-        <div>
+        <>
             <Header>
                 <Logo>QuickRef</Logo>
                 <RightBlock>
@@ -76,7 +98,7 @@ const RefsPage: FC<RefsPageProps> = () => {
                         {minutes}:{seconds < 10 ? '0' : ''}
                         {seconds}
                     </Timer>
-                    <IconButton size="large" sx={{ mr: 1 }}>
+                    <IconButton size="large" sx={{ mr: 1 }} onClick={openModal}>
                         <InfoOutlined />
                     </IconButton>
                     <IconButton size="large" onClick={endSession}>
@@ -106,7 +128,35 @@ const RefsPage: FC<RefsPageProps> = () => {
                     <ArrowRight />
                 </IconButton>
             </Footer>
-        </div>
+
+            <Modal
+                open={open}
+                onClose={closeModal}
+                aria-labelledby="modal-modal-title"
+                aria-describedby="modal-modal-description"
+            >
+                <>
+                    <Box sx={{ ...modalBoxStyle, width: '600px', padding: '42px' }}>
+                        <ModalTitle>Об изображении</ModalTitle>
+                        <IconButton
+                            size="large"
+                            onClick={closeModal}
+                            sx={{ position: 'absolute', top: '10px', right: '10px' }}
+                        >
+                            <Close />
+                        </IconButton>
+                        <InfoItem>
+                            <ItemTitle>Автор</ItemTitle>
+                            <ItemData>{currentInfo ? currentInfo.author : ''}</ItemData>
+                        </InfoItem>
+                        <InfoItem>
+                            <ItemTitle>Источник</ItemTitle>
+                            <ItemData>{currentInfo ? currentInfo.source : ''}</ItemData>
+                        </InfoItem>
+                    </Box>
+                </>
+            </Modal>
+        </>
     );
 };
 
