@@ -6,8 +6,9 @@ import { observer } from 'mobx-react-lite';
 import AdminPage from '@pages/AdminPage';
 import Categories from '@pages/Categories/Categories';
 import MainPage from '@pages/MainPage';
+import ProfilePage from '@pages/ProfilePage';
 import RefsPage from '@pages/RefsPage';
-import { useAuthStore } from '@stores/AuthStore';
+import { useAuthStore, useUserStore } from '@stores/RootStore/hooks';
 
 export enum PathsEnum {
     main = '/',
@@ -17,13 +18,14 @@ export enum PathsEnum {
 }
 
 const Router: FC = () => {
-    const { isAuthenticated, isAdmin } = useAuthStore();
+    const { isAuthenticated } = useAuthStore();
+    const { isAdmin } = useUserStore();
 
     const authChildrenRoutes = isAuthenticated
         ? [
               {
                   path: PathsEnum.profile,
-                  element: <div>profile page</div>,
+                  element: <ProfilePage />,
               },
           ]
         : [];

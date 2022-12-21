@@ -1,33 +1,32 @@
 import { makeAutoObservable } from 'mobx';
 
+import RootStore from '@stores/RootStore';
+import UserStore from '@stores/UserStore';
 import { users } from './mock';
 
-class AuthStore {
-    private _isAuthenticated = false;
-    private _isAdmin = false;
+type PrivateFields = '_isAuthenticated' | '_isAdmin' | 'userStore';
 
-    constructor() {
-        makeAutoObservable(this);
+class AuthStore {
+    private userStore: UserStore;
+
+    private _isAuthenticated = false;
+
+    constructor(rootStore: RootStore) {
+        makeAutoObservable<this, PrivateFields>(this);
+        this.userStore = rootStore.userStore;
     }
 
     get isAuthenticated() {
         return this._isAuthenticated;
     }
 
-    get isAdmin() {
-        return this._isAdmin;
-    }
-
+    // todo email -> id ?
     getUser = (email: string) => {
         return users.find((user) => user.email === email);
     };
 
     setIsAuthenticated = (isAuth: boolean) => {
         this._isAuthenticated = isAuth;
-    };
-
-    setIsAdmin = (isAdmin: boolean) => {
-        this._isAdmin = isAdmin;
     };
 
     getIsExist = (email: string, password: string) => {
@@ -37,7 +36,6 @@ class AuthStore {
     loginHandler = (email: string, password: string) => {
         if (this.getIsExist(email, password)) {
             this.setIsAuthenticated(true);
-            this.setIsAdmin(!!this.getUser(email)?.isAdmin);
             return;
         }
 
@@ -56,7 +54,6 @@ class AuthStore {
 
     logoutHandler = () => {
         this.setIsAuthenticated(false);
-        this.setIsAdmin(false);
     };
 }
 

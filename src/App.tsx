@@ -1,13 +1,13 @@
 import React from 'react';
 
 import Router from '@pages/Router';
-import { AuthStoreProvider } from '@stores/AuthStore';
+import RootStoreProvider from '@stores/RootStore/context';
 
 const App = () => {
     return (
-        <AuthStoreProvider>
+        <RootStoreProvider>
             <Router />
-        </AuthStoreProvider>
+        </RootStoreProvider>
     );
 };
 

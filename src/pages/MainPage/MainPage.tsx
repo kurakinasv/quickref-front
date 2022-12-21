@@ -9,7 +9,7 @@ import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import { PathsEnum } from '@pages/Router';
-import { useAuthStore } from '@stores/AuthStore';
+import { useAuthStore, useUserStore } from '@stores/RootStore/hooks';
 import { modalBoxStyle } from '@styles/consts';
 
 import {
@@ -25,8 +25,8 @@ import {
 } from './MainPage.styles';
 
 const MainPage = () => {
-    const { isAuthenticated, isAdmin, loginHandler, registerHandler, logoutHandler } =
-        useAuthStore();
+    const { isAuthenticated, loginHandler, registerHandler, logoutHandler } = useAuthStore();
+    const { isAdmin } = useUserStore();
 
     const [isRegistered, setIsRegistered] = useState(true);
 

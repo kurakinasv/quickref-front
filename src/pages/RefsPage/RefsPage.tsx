@@ -17,7 +17,7 @@ import {
     SelectChangeEvent,
 } from '@mui/material';
 import { PathsEnum } from '@pages/Router';
-import { useAuthStore } from '@stores/AuthStore';
+import { useAuthStore } from '@stores/RootStore/hooks';
 import { modalBoxStyle } from '@styles/consts';
 import { collections, refsInfo } from './mock';
 import useTimer from './useTimer';
