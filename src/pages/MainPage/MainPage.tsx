@@ -57,8 +57,9 @@ const MainPage = () => {
                     <NavBar>
                         {isAuthenticated && (
                             <>
-                                <NavLink to={PathsEnum.profile}>Профиль</NavLink>
                                 {isAdmin && <NavLink to={PathsEnum.admin}>Админ-панель</NavLink>}
+                                <NavLink to={PathsEnum.profile}>Профиль</NavLink>
+                                <NavLink to={PathsEnum.collection}>Избранное</NavLink>
                                 <LinkButton onClick={logoutHandler}>Выйти</LinkButton>
                             </>
                         )}

@@ -5,6 +5,7 @@ import { observer } from 'mobx-react-lite';
 
 import AdminPage from '@pages/AdminPage';
 import Categories from '@pages/Categories/Categories';
+import CollectionPage from '@pages/CollectionPage';
 import MainPage from '@pages/MainPage';
 import ProfilePage from '@pages/ProfilePage';
 import RefsPage from '@pages/RefsPage';
@@ -13,6 +14,7 @@ import { useAuthStore, useUserStore } from '@stores/RootStore/hooks';
 export enum PathsEnum {
     main = '/',
     profile = 'profile',
+    collection = 'collection',
     admin = 'admin',
     refs = '/refs',
 }
@@ -26,6 +28,10 @@ const Router: FC = () => {
               {
                   path: PathsEnum.profile,
                   element: <ProfilePage />,
+              },
+              {
+                  path: PathsEnum.collection,
+                  element: <CollectionPage />,
               },
           ]
         : [];

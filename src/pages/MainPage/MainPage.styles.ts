@@ -25,6 +25,8 @@ export const Header = styled.header`
     align-items: center;
 
     background-color: ${colors.lightPink};
+
+    z-index: 10;
 `;
 
 export const Logo = styled(Link)`
