@@ -6,20 +6,11 @@ import { observer } from 'mobx-react-lite';
 import useModal from '@hooks/useModal';
 import refs from '@img/refs';
 import { ArrowLeft, ArrowRight, Close, InfoOutlined } from '@mui/icons-material';
-import {
-    Box,
-    Button,
-    IconButton,
-    InputLabel,
-    MenuItem,
-    Modal,
-    Select,
-    SelectChangeEvent,
-} from '@mui/material';
+import { Box, Button, IconButton, Modal } from '@mui/material';
 import { PathsEnum } from '@pages/Router';
-import { useAuthStore } from '@stores/RootStore/hooks';
+import { useAuthStore, useUserStore } from '@stores/RootStore/hooks';
 import { modalBoxStyle } from '@styles/consts';
-import { collections, refsInfo } from './mock';
+import { refsInfo } from './mock';
 import useTimer from './useTimer';
 
 import {
@@ -55,6 +46,7 @@ const RefsPage: FC<RefsPageProps> = () => {
     const navigate = useNavigate();
 
     const { isAuthenticated } = useAuthStore();
+    const { setFavourites } = useUserStore();
 
     const { open, openModal, closeModal } = useModal();
     const {
@@ -98,10 +90,10 @@ const RefsPage: FC<RefsPageProps> = () => {
 
     const endSession = () => {
         // if images are selected and collection is not
-        if (!!selectedImages.length && !collection) {
-            console.log('Не выбрана коллекция!');
-            return;
-        }
+        // if (!!selectedImages.length && !collection) {
+        //     console.log('Не выбрана коллекция!');
+        //     return;
+        // }
 
         // if collection is selected and images are not
         if (!selectedImages.length && !!collection) {
@@ -110,6 +102,7 @@ const RefsPage: FC<RefsPageProps> = () => {
         }
 
         console.log('saving data...', collection, selectedImages);
+        setFavourites(selectedImages);
 
         closeCollectionsModal();
         navigate(PathsEnum.main);
@@ -128,9 +121,9 @@ const RefsPage: FC<RefsPageProps> = () => {
 
     const [collection, setCollection] = useState('');
 
-    const onSelectChange = (event: SelectChangeEvent) => {
-        setCollection(event.target.value);
-    };
+    // const onSelectChange = (event: SelectChangeEvent) => {
+    //     setCollection(event.target.value);
+    // };
 
     const [selectedImages, setSelectedImages] = useState<string[]>([]);
 
@@ -234,7 +227,7 @@ const RefsPage: FC<RefsPageProps> = () => {
                 <Modal open={collectionsOpen} onClose={closeCollectionsModal}>
                     <>
                         <Box sx={{ ...modalBoxStyle, width: '900px', padding: '42px' }}>
-                            <ModalTitle>Добавить в коллекцию</ModalTitle>
+                            <ModalTitle>Добавить в избранное</ModalTitle>
                             <IconButton
                                 size="large"
                                 onClick={closeCollectionsModal}
@@ -243,7 +236,7 @@ const RefsPage: FC<RefsPageProps> = () => {
                                 <Close />
                             </IconButton>
 
-                            <StyledFormControl fullWidth={true}>
+                            {/* <StyledFormControl fullWidth={true}>
                                 <InputLabel id="collection-select-label">Коллекция</InputLabel>
                                 <Select
                                     size="small"
@@ -262,7 +255,7 @@ const RefsPage: FC<RefsPageProps> = () => {
                                         </MenuItem>
                                     ))}
                                 </Select>
-                            </StyledFormControl>
+                            </StyledFormControl> */}
 
                             <ImageBlock>
                                 {Object.values(refs).map((ref, id) => {

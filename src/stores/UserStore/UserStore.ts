@@ -34,6 +34,7 @@ class UserStore {
     private _email = '';
     private _nickname = '';
     private _isAdmin = false;
+    private _favourites: string[] = [];
 
     private password = '';
     private userId = '';
@@ -66,6 +67,10 @@ class UserStore {
         return this._isAdmin;
     }
 
+    get favourites() {
+        return this._favourites;
+    }
+
     getUser = (email: string) => {
         return users.find((user) => user.email === email);
     };
@@ -96,6 +101,10 @@ class UserStore {
 
     setIsAdmin = (isAdmin: boolean) => {
         this._isAdmin = isAdmin;
+    };
+
+    setFavourites = (favs: string[]) => {
+        this._favourites = [...this._favourites, ...favs];
     };
 
     initUser = ({

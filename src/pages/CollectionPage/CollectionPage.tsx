@@ -1,10 +1,12 @@
 import React, { FC, useMemo, useState } from 'react';
 
+import { observer } from 'mobx-react-lite';
+
 import useModal from '@hooks/useModal';
-import refs from '@img/refs';
 import { Close } from '@mui/icons-material';
 import { Box, Grid, IconButton, Modal, TextField } from '@mui/material';
 import { refsInfo } from '@pages/RefsPage/mock';
+import { useUserStore } from '@stores/RootStore/hooks';
 import { modalBoxStyle } from '@styles/consts';
 
 import {
@@ -18,6 +20,8 @@ import {
 } from './CollectionPage.styles';
 
 const CollectionPage: FC = () => {
+    const { favourites } = useUserStore();
+
     const { open, openModal, closeModal } = useModal();
 
     const [currentImage, setCurrentImage] = useState('');
@@ -67,7 +71,7 @@ const CollectionPage: FC = () => {
                 />
 
                 <Grid container columns={5} rowSpacing={2} columnSpacing={{ xs: 2, md: 2 }}>
-                    {Object.values(refs).map((ref, id) => {
+                    {Object.values(favourites).map((ref, id) => {
                         return (
                             <Grid item xs={1} key={ref + id} justifyContent="center">
                                 <ImageItem imgUrl={ref} data-url={ref} onClick={handleClick} />
@@ -103,4 +107,4 @@ const CollectionPage: FC = () => {
     );
 };
 
-export default CollectionPage;
+export default observer(CollectionPage);
