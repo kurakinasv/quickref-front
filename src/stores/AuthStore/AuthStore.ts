@@ -47,7 +47,12 @@ class AuthStore {
             throw new Error('This user is already exist');
         }
 
-        users.push({ id: String(Number(users[users.length - 1].id) + 1), email, password });
+        users.push({
+            id: String(Number(users[users.length - 1].id) + 1),
+            email,
+            password,
+            isAdmin: false,
+        });
 
         this.setIsAuthenticated(true);
     };
