@@ -30,7 +30,7 @@ const Router: FC = () => {
                   element: <ProfilePage />,
               },
               {
-                  path: PathsEnum.collection,
+                  path: `${PathsEnum.collection}/:id`,
                   element: <CollectionPage />,
               },
           ]

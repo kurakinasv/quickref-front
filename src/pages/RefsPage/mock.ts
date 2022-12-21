@@ -44,6 +44,7 @@ export const refsInfo: Record<keyof RefsType, { id: string; author: string; sour
 };
 
 export const collections = [
+    { id: 'favs', name: 'favourites' },
     { id: '1', name: 'col1' },
     { id: '2', name: 'col2' },
     { id: '3', name: 'col3' },

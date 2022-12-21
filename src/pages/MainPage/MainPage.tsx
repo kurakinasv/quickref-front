@@ -8,6 +8,7 @@ import { Button, Input } from '@mui/material';
 import Box from '@mui/material/Box';
 import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
+import { collections } from '@pages/RefsPage/mock';
 import { PathsEnum } from '@pages/Router';
 import { useAuthStore, useUserStore } from '@stores/RootStore/hooks';
 import { modalBoxStyle } from '@styles/consts';
@@ -59,7 +60,9 @@ const MainPage = () => {
                             <>
                                 {isAdmin && <NavLink to={PathsEnum.admin}>Админ-панель</NavLink>}
                                 <NavLink to={PathsEnum.profile}>Профиль</NavLink>
-                                <NavLink to={PathsEnum.collection}>Избранное</NavLink>
+                                <NavLink to={`${PathsEnum.collection}/${collections[0].id}`}>
+                                    Избранное
+                                </NavLink>
                                 <LinkButton onClick={logoutHandler}>Выйти</LinkButton>
                             </>
                         )}
