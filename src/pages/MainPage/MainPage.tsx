@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
@@ -26,8 +26,13 @@ import {
 } from './MainPage.styles';
 
 const MainPage = () => {
-    const { isAuthenticated, loginHandler, registerHandler, logoutHandler } = useAuthStore();
+    const { isAuthenticated, loginHandler, registerHandler, logoutHandler, initUser } =
+        useAuthStore();
     const { isAdmin } = useUserStore();
+
+    useEffect(() => {
+        initUser();
+    }, []);
 
     const [isRegistered, setIsRegistered] = useState(true);
 
