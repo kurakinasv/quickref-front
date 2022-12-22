@@ -22,7 +22,7 @@
  		    "@pages/*": ["pages/*"],
  		    "@stores/*": ["stores/*"],
 			"@styles/*": ["styles/*"],
-			"@types/*": ["types/*"],
+			"@typings/*": ["types/*"],
 			"@utils/*": ["utils/*"],
 		},
         "useDefineForClassFields": true,

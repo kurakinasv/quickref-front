@@ -54,7 +54,7 @@ module.exports = {
             '@pages': createAliasPath('pages'),
             '@stores': createAliasPath('stores'),
             '@styles': createAliasPath('styles'),
-            '@types': createAliasPath('types'),
+            '@typings': createAliasPath('types'),
             '@utils': createAliasPath('utils'),
         },
     },

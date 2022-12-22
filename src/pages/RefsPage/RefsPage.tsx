@@ -1,16 +1,16 @@
-import React, { FC, MouseEvent, useEffect, useMemo, useState } from 'react';
+import React, { FC, MouseEvent, useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
 
+import { BASE_URL } from '@config/api';
 import useModal from '@hooks/useModal';
-import refs from '@img/refs';
 import { ArrowLeft, ArrowRight, Close, InfoOutlined } from '@mui/icons-material';
 import { Box, Button, IconButton, Modal } from '@mui/material';
 import { PathsEnum } from '@pages/Router';
 import { useAuthStore, useUserStore } from '@stores/RootStore/hooks';
 import { modalBoxStyle } from '@styles/consts';
-import { refsInfo } from './mock';
+import { AuthorType, RefType } from '@typings/api';
 import useTimer from './useTimer';
 
 import {
@@ -27,7 +27,6 @@ import {
     ModalTitle,
     RefImage,
     RightBlock,
-    StyledFormControl,
     Timer,
 } from './RefsPage.styles';
 
@@ -41,7 +40,42 @@ enum ArrowDirection {
 }
 
 const RefsPage: FC<RefsPageProps> = () => {
-    const imageAmount = Object.keys(refs).length;
+    const [dbRefs, setDBRefs] = useState<RefType[]>([]);
+    const [currentImageNum, setCurrentImageNum] = useState(0);
+    const [currentRef, setCurrentRef] = useState(dbRefs[currentImageNum]);
+
+    const imageAmount = dbRefs.length;
+
+    const getRefs = async () => {
+        const data = await fetch(`${BASE_URL}api/image/images`);
+        const response: RefType[] = await data.json();
+
+        if (response) {
+            setDBRefs(response);
+            setCurrentRef(response[0]);
+        }
+    };
+
+    const [author, setAuthor] = useState<AuthorType | null>(null);
+
+    const getAuthor = async (id: number) => {
+        const data = await fetch(`${BASE_URL}/api/author/${id}`);
+        const response = await data.json();
+
+        setAuthor(response);
+    };
+
+    useEffect(() => {
+        getRefs();
+    }, []);
+
+    useEffect(() => {
+        if (currentRef && currentRef.authorId) {
+            getAuthor(currentRef.authorId);
+        } else {
+            setAuthor(null);
+        }
+    }, [currentRef]);
 
     const navigate = useNavigate();
 
@@ -57,9 +91,6 @@ const RefsPage: FC<RefsPageProps> = () => {
 
     const { stopTimer, seconds, minutes, refNumber, setRefNumber } = useTimer();
 
-    const [currentImageNum, setCurrentImageNum] = useState(0);
-    const [currentImage, setCurrentImage] = useState(refs.camp);
-
     const nextImageNumber = (imgAmount: number) => {
         return currentImageNum === imgAmount - 1 ? 0 : currentImageNum + 1;
     };
@@ -74,10 +105,10 @@ const RefsPage: FC<RefsPageProps> = () => {
                 ? prevImageNumber(imageAmount)
                 : nextImageNumber(imageAmount);
 
-        const currImg = Object.values(refs)[currImgNum];
+        const currImg = dbRefs[currImgNum];
 
         setCurrentImageNum(currImgNum);
-        setCurrentImage(currImg);
+        setCurrentRef(currImg);
     };
 
     const handleChangeRefClick = (arrowDir: ArrowDirection) => () => {
@@ -101,7 +132,6 @@ const RefsPage: FC<RefsPageProps> = () => {
             return;
         }
 
-        console.log('saving data...', collection, selectedImages);
         setFavourites(selectedImages);
 
         closeCollectionsModal();
@@ -113,11 +143,6 @@ const RefsPage: FC<RefsPageProps> = () => {
             changeRef(ArrowDirection.next);
         }
     }, [minutes === 0 && seconds === 0]);
-
-    const currentInfo = useMemo(
-        () => Object.entries(refsInfo)?.find(([key]) => key === currentImage)?.[1],
-        [currentImage]
-    );
 
     const [collection, setCollection] = useState('');
 
@@ -178,7 +203,7 @@ const RefsPage: FC<RefsPageProps> = () => {
                 </RightBlock>
             </Header>
             <Content>
-                <RefImage src={currentImage} alt="ref" />
+                {currentRef && <RefImage src={BASE_URL + currentRef.name} alt="ref" />}
             </Content>
             <Footer>
                 <IconButton
@@ -211,13 +236,15 @@ const RefsPage: FC<RefsPageProps> = () => {
                         >
                             <Close />
                         </IconButton>
-                        <InfoItem>
-                            <ItemTitle>Автор</ItemTitle>
-                            <ItemData>{currentInfo ? currentInfo.author : ''}</ItemData>
-                        </InfoItem>
+                        {author && (
+                            <InfoItem>
+                                <ItemTitle>Автор</ItemTitle>
+                                <ItemData>{author.nickname}</ItemData>
+                            </InfoItem>
+                        )}
                         <InfoItem>
                             <ItemTitle>Источник</ItemTitle>
-                            <ItemData>{currentInfo ? currentInfo.source : ''}</ItemData>
+                            <ItemData>{currentRef ? currentRef.source : ''}</ItemData>
                         </InfoItem>
                     </Box>
                 </>
@@ -258,13 +285,13 @@ const RefsPage: FC<RefsPageProps> = () => {
                             </StyledFormControl> */}
 
                             <ImageBlock>
-                                {Object.values(refs).map((ref, id) => {
+                                {dbRefs.map(({ name: ref }, id) => {
                                     const isActive = !!selectedImages.find((img) => img === ref);
                                     return (
                                         <ImageButton
                                             key={ref + id}
                                             id={ref + 'image-button'}
-                                            imgUrl={ref}
+                                            imgUrl={BASE_URL + ref}
                                             isActive={isActive}
                                             onClick={selectImage}
                                         />
