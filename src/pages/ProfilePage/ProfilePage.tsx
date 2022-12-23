@@ -3,7 +3,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { Box, FormControl, InputLabel, OutlinedInput } from '@mui/material';
-import { useAuthStore } from '@stores/RootStore/hooks';
+import { useUserStore } from '@stores/RootStore/hooks';
 import { UserType } from '@stores/UserStore/UserStore';
 
 import { Content, PageTitle, StyledButton } from './ProfilePage.styles';
@@ -24,7 +24,7 @@ const ProfilePage: FC = () => {
     const {
         user: { name, surname, username, email },
         editUser,
-    } = useAuthStore();
+    } = useUserStore();
 
     useEffect(() => {
         setUserInfo({ name, surname, username, email });

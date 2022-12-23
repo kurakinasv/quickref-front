@@ -4,10 +4,11 @@ import { observer } from 'mobx-react-lite';
 
 import Router from '@pages/Router';
 import RootStoreProvider from '@stores/RootStore/context';
-import { useAuthStore } from '@stores/RootStore/hooks';
+import { useAuthStore, useUserStore } from '@stores/RootStore/hooks';
 
 const App = () => {
-    const { initUser, getUser, isAuthenticated } = useAuthStore();
+    const { initUser, isAuthenticated } = useAuthStore();
+    const { getUser } = useUserStore();
 
     useEffect(() => {
         initUser();

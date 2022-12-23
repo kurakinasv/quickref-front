@@ -1,142 +1,133 @@
-import { makeAutoObservable } from 'mobx';
+import { makeAutoObservable, toJS } from 'mobx';
 
-import { users } from '@stores/AuthStore/mock';
+import { headers } from '@config/api';
+import endpoints from '@config/endpoints';
 import RootStore from '@stores/RootStore';
+import { formUrl } from '@utils/formUrl';
+import { getAuthHeader } from '@utils/getAuthHeader';
 
 export type UserType = {
-    id: string;
+    id: number;
     email: string;
     password: string;
+    isAdmin: boolean;
     name?: string;
     surname?: string;
     username?: string;
-    isAdmin: boolean;
-    createdAt?: Date;
     about?: string;
+    createdAt: string;
 };
 
 export type UserInfoType = Pick<UserType, 'email' | 'name' | 'surname' | 'username'>;
 
-type PrivateFields =
-    | '_id'
-    | '_userName'
-    | '_userSurname'
-    | '_email'
-    | '_nickname'
-    | 'password'
-    | 'userId'
-    | 'rootStore';
+type PrivateFields = 'rootStore';
 
 class UserStore {
-    private _id = '';
-    private _userName = '';
-    private _userSurname = '';
-    private _email = '';
-    private _nickname = '';
-    private _isAdmin = false;
-    private _favourites: string[] = [];
-
-    private password = '';
-    private userId = '';
     private rootStore: RootStore;
 
-    public user = {};
+    private _user = {} as UserType;
+    private _userId: number | null = null;
+    private _favourites: string[] = [];
 
     constructor(rootStore: RootStore) {
         makeAutoObservable<this, PrivateFields>(this);
         this.rootStore = rootStore;
     }
 
-    get userName() {
-        return this._userName;
+    get token() {
+        return this.rootStore.authStore.token;
     }
 
-    get surname() {
-        return this._userSurname;
+    get user() {
+        return this._user;
     }
 
-    get email() {
-        return this._email;
-    }
-
-    get nickname() {
-        return this._nickname;
-    }
-
-    get isAdmin() {
-        return this._isAdmin;
+    get userId() {
+        return this._userId;
     }
 
     get favourites() {
         return this._favourites;
     }
 
-    getUser = (email: string) => {
-        return users.find((user) => user.email === email);
+    setUserData = (data: UserType) => {
+        this._user = data;
     };
 
-    setUserId = (id: string) => {
-        this.userId = id;
-    };
-
-    setUserName = (name: string) => {
-        this._userName = name;
-    };
-
-    setSurname = (surname: string) => {
-        this._userSurname = surname;
-    };
-
-    setEmail = (email: string) => {
-        this._email = email;
-    };
-
-    setNickname = (nick: string) => {
-        this._nickname = nick;
-    };
-
-    setPassword = (hash: string) => {
-        this.password = hash;
-    };
-
-    setIsAdmin = (isAdmin: boolean) => {
-        this._isAdmin = isAdmin;
+    setUserId = (id: number | null) => {
+        this._userId = id;
     };
 
     setFavourites = (favs: string[]) => {
         this._favourites = [...this._favourites, ...favs];
     };
 
-    initUser = ({
-        id,
-        password,
-        isAdmin,
-        name,
-        surname,
-        email,
-        username,
-        createdAt,
-        about,
-    }: UserType) => {
-        this.updateUserInfo({ name, surname, email, username });
-        this.setIsAdmin(isAdmin);
-        this.setUserId(id);
-        this.setPassword(password);
+    getUser = async () => {
+        const url = formUrl(endpoints.getUser.url);
+
+        try {
+            const response = await fetch(url, {
+                method: endpoints.getUser.method,
+                headers: { ...headers, ...getAuthHeader(this.token) },
+            });
+
+            const data = await response.json();
+
+            if (data) {
+                console.log('getUser', toJS(data));
+
+                const {
+                    about,
+                    createdAt,
+                    email,
+                    id,
+                    is_admin: isAdmin,
+                    name,
+                    password,
+                    surname,
+                    username,
+                } = data;
+
+                this.setUserData({
+                    about,
+                    createdAt,
+                    email,
+                    id,
+                    isAdmin,
+                    name,
+                    password,
+                    surname,
+                    username,
+                });
+            }
+        } catch (err: any) {
+            throw new Error(`getUser: ${err.message}`);
+        }
     };
 
-    updateUserInfo = ({ name, surname, email, username }: UserInfoType) => {
-        this.setUserName(name || this._userName);
-        this.setSurname(surname || this._userSurname);
-        this.setEmail(email || this._email);
-        this.setNickname(username || this._userName);
-    };
+    editUser = async ({ name, surname, email, username }: UserInfoType) => {
+        const url = formUrl(endpoints.editUser.url);
 
-    clearLocalData = () => {
-        this.setUserName('');
-        this.setSurname('');
-        this.setEmail('');
-        this.setNickname('');
-        this.setIsAdmin(false);
+        try {
+            console.log();
+
+            const response = await fetch(url, {
+                method: endpoints.editUser.method,
+                body: JSON.stringify({ id: this.userId, name, surname, email, username }),
+                headers: { ...headers, ...getAuthHeader(this.token) },
+            });
+
+            const data = await response.json();
+
+            if (data) {
+                console.log(data);
+
+                this.setUserData(data);
+                await this.getUser();
+            }
+        } catch (err: any) {
+            throw Error(`editUser: ${err.message}`);
+        }
     };
 }
 
