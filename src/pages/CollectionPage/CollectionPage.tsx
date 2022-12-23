@@ -20,7 +20,11 @@ import {
 } from './CollectionPage.styles';
 
 const CollectionPage: FC = () => {
-    const { allRefs, getRefs, getAuthor, author } = useUserStore();
+    const { allRefs, getRefs, getAuthor, author, favImages, getCollection } = useUserStore();
+
+    useEffect(() => {
+        getCollection();
+    }, []);
 
     const { open, openModal, closeModal } = useModal();
 
@@ -87,12 +91,12 @@ const CollectionPage: FC = () => {
                 />
 
                 <Grid container columns={5} rowSpacing={2} columnSpacing={{ xs: 2, md: 2 }}>
-                    {allRefs.map((ref, id) => {
+                    {favImages.map(({ name }, id) => {
                         return (
-                            <Grid item xs={1} key={ref.name + id} justifyContent="center">
+                            <Grid item xs={1} key={name + id} justifyContent="center">
                                 <ImageItem
-                                    imgUrl={BASE_URL + ref.name}
-                                    data-url={ref.name}
+                                    imgUrl={BASE_URL + name}
+                                    data-url={name}
                                     onClick={handleClick}
                                 />
                             </Grid>

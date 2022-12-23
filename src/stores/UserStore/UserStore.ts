@@ -30,6 +30,7 @@ class UserStore {
     private _userId: number | null = null;
     private _favourites: string[] = [];
     private _author: AuthorType | null = null;
+    private _authors: AuthorType[] = [];
     private _allRefs: RefType[] = [];
 
     constructor(rootStore: RootStore) {
@@ -43,6 +44,10 @@ class UserStore {
 
     get author() {
         return this._author;
+    }
+
+    get authors() {
+        return this._authors;
     }
 
     get token() {
@@ -73,8 +78,22 @@ class UserStore {
         this._favourites = [...this._favourites, ...favs];
     };
 
-    setAuthor = (author: AuthorType) => {
+    _favImages: RefType[] = [];
+
+    get favImages() {
+        return this._favImages;
+    }
+
+    setFavImages = (favs: RefType[]) => {
+        this._favImages = favs;
+    };
+
+    setAuthor = (author: AuthorType | null) => {
         this._author = author;
+    };
+
+    setAllAuthors = (authors: AuthorType[]) => {
+        this._authors = authors;
     };
 
     setAllRefs = (refs: RefType[]) => {
@@ -147,9 +166,9 @@ class UserStore {
         }
     };
 
-    getCollection = async () => {
+    getCollection = async (id?: number) => {
         // todo delete mock id
-        const url = formUrl(`${endpoints.getCollections.url}/2`);
+        const url = formUrl(`${endpoints.getCollections.url}/${id || 'fav'}`);
 
         try {
             const response = await fetch(url, {
@@ -162,12 +181,14 @@ class UserStore {
             if (data) {
                 await this.getRefs();
                 console.log(data);
-                const { imgCol } = data;
+                const { imgCol } = data; // [{imageId: 3, ...}, {}...]
+
                 const arrId = imgCol.map(({ imageId }) => imageId);
-                const favs = this.allRefs
-                    .filter((ref) => arrId.includes(ref.id))
-                    .map((ref) => ref.name);
-                this.setFavourites(favs);
+
+                const favs = this.allRefs.filter((ref) => arrId.includes(ref.id));
+                this.setFavImages(favs);
+
+                this.setFavourites(favs.map((ref) => ref.name));
             }
         } catch (err: any) {
             throw Error(`getCollection: ${err.message}`);
@@ -193,24 +214,86 @@ class UserStore {
         }
     };
 
-    getAuthor = async (id: number) => {
+    getAuthor = async (id?: number) => {
         try {
-            const response = await fetch(`${BASE_URL}/api/author/${id}`, {
+            const response = await fetch(`${BASE_URL}api/author/${id || ''}`, {
                 method: 'GET',
                 headers,
             });
             const data = await response.json();
 
             if (data) {
-                this.setAuthor(data);
+                if (id) {
+                    this.setAuthor(data);
+                } else {
+                    this.setAllAuthors(data);
+                }
             }
         } catch (err: any) {
             throw Error(`getAuthor: ${err.message}`);
         }
     };
+
+    findAuthorByNickName = async (nick: string) => {
+        await this.getAuthor();
+        return this.authors.find((a) => a.nickname === nick);
+    };
+
+    // https://unsplash.com/photos/gKXKBY-C-Dk
+    // https://unsplash.com/@madhatterzone
+    uploadImage = async (
+        date_upload: Date,
+        source: string,
+        categoryId: number,
+        nickname: string,
+        name: File
+    ) => {
+        try {
+            const author = await this.findAuthorByNickName(nickname);
+            console.log(toJS(author));
+
+            const toSend = new FormData();
+            toSend.append('files', name);
+            toSend.append(
+                'info',
+                JSON.stringify({ date_upload, source, categoryId, authorId: author?.id })
+            );
+
+            const response = await fetch(`${BASE_URL}api/image/upload`, {
+                method: 'POST',
+                body: toSend,
+                headers: getAuthHeader(this.token),
+            });
+            const data: RefType[] = await response.json();
+
+            if (data) {
+                console.log(toJS(data));
+            }
+        } catch (err: any) {
+            throw Error(`getRefs: ${err.message}`);
+        }
+    };
+
+    addToCollection = async (imageId: number) => {
+        try {
+            const id = imageId;
+            const response = await fetch(`${BASE_URL}api/image/add`, {
+                method: 'POST',
+                body: JSON.stringify({ id, collectionId: null }),
+                headers: { ...headers, ...getAuthHeader(this.token) },
+            });
+            const data: RefType[] = await response.json();
+
+            if (data) {
+                console.log(toJS(data));
+            }
+        } catch (err: any) {
+            throw Error(`addToCollection: ${err.message}`);
+        }
+    };
 }
 
-type ImageCollectionType = {
+export type ImageCollectionType = {
     collectionId: number;
     createdAt: string;
     imageId: number;

@@ -1,5 +1,6 @@
 import React, { FC, useState } from 'react';
 
+import { BASE_URL, headers } from '@config/api';
 import { categoriesInfo } from '@config/categories';
 import { FileUploadOutlined } from '@mui/icons-material';
 import {
@@ -11,6 +12,7 @@ import {
     Select,
     SelectChangeEvent,
 } from '@mui/material';
+import { useUserStore } from '@stores/RootStore/hooks';
 
 import {
     Content,
@@ -25,13 +27,26 @@ import {
 } from './AdminPage.styles';
 
 const AdminPage: FC = () => {
+    const { uploadImage } = useUserStore();
+
     const [value, setValue] = useState({
-        fileName: '',
+        // fileName: '',
         source: '',
-        authorName: '',
-        authorSurname: '',
-        authorMedia: '',
+        nickname: '',
+        name: '',
+        surname: '',
+        socialMedia: '',
     });
+
+    const [image, setImage] = useState<File | null>(null);
+
+    const onImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const files = event.target.files;
+        if (!files) {
+            return;
+        }
+        setImage(files[0]);
+    };
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -45,8 +60,14 @@ const AdminPage: FC = () => {
     };
 
     // todo add image uploading
-    const sendToDB = () => {
-        console.log('...sending', { ...value, category });
+    const sendToDB = async () => {
+        const cat = Number(category);
+        console.log('...sending', { ...value, cat });
+        console.log('image', image);
+
+        if (image) {
+            await uploadImage(new Date(), value.source, cat, value.nickname, image);
+        }
 
         const newValues = Object.entries(value).reduce(
             (obj, [key]) => ({ ...obj, [key]: '' }),
@@ -66,20 +87,26 @@ const AdminPage: FC = () => {
                     <StyledInputLabel htmlFor="file-upload-input">
                         <FileUploadOutlined />
                     </StyledInputLabel>
-                    <Input type="file" id="file-upload-input" />
+                    <input
+                        type="file"
+                        id="file-upload-input"
+                        accept=".jpg"
+                        hidden
+                        onChange={onImageChange}
+                    />
                 </UploadImage>
 
                 <InfoPanel>
                     <InfoPanelItem>
                         <SubTitle>Изображение</SubTitle>
-                        <OutlinedInput
+                        {/* <OutlinedInput
                             fullWidth={true}
                             size="small"
                             placeholder="Имя файла"
                             name="fileName"
                             onChange={handleChange}
                             value={value.fileName}
-                        />
+                        /> */}
                         <OutlinedInput
                             fullWidth={true}
                             size="small"
@@ -103,7 +130,7 @@ const AdminPage: FC = () => {
                                     Не выбрано
                                 </MenuItem>
                                 {Object.entries(categoriesInfo).map(([key, { id, name }]) => (
-                                    <MenuItem key={id} value={key}>
+                                    <MenuItem key={id} value={String(id)}>
                                         {name}
                                     </MenuItem>
                                 ))}
@@ -116,27 +143,35 @@ const AdminPage: FC = () => {
                         <OutlinedInput
                             fullWidth={true}
                             size="small"
-                            placeholder="Имя"
-                            name="authorName"
+                            placeholder="Никнейм"
+                            name="nickname"
                             onChange={handleChange}
-                            value={value.authorName}
+                            value={value.nickname}
+                        />
+                        {/* <OutlinedInput
+                            fullWidth={true}
+                            size="small"
+                            placeholder="Имя"
+                            name="name"
+                            onChange={handleChange}
+                            value={value.name}
                         />
                         <OutlinedInput
                             fullWidth={true}
                             size="small"
                             placeholder="Фамилия"
-                            name="authorSurname"
+                            name="surname"
                             onChange={handleChange}
-                            value={value.authorSurname}
+                            value={value.surname}
                         />
                         <OutlinedInput
                             fullWidth={true}
                             size="small"
                             placeholder="Медиа"
-                            name="authorMedia"
+                            name="socialMedia"
                             onChange={handleChange}
-                            value={value.authorMedia}
-                        />
+                            value={value.socialMedia}
+                        /> */}
                     </InfoPanelItem>
                 </InfoPanel>
             </Form>

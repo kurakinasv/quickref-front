@@ -40,22 +40,13 @@ enum ArrowDirection {
 }
 
 const RefsPage: FC<RefsPageProps> = () => {
-    const { getRefs, allRefs } = useUserStore();
+    const { getRefs, allRefs, getAuthor, author, setAuthor, addToCollection } = useUserStore();
 
     const [dbRefs, setDBRefs] = useState<RefType[]>([]);
     const [currentImageNum, setCurrentImageNum] = useState(0);
     const [currentRef, setCurrentRef] = useState(dbRefs[currentImageNum]);
 
     const imageAmount = dbRefs.length;
-
-    const [author, setAuthor] = useState<AuthorType | null>(null);
-
-    const getAuthor = async (id: number) => {
-        const data = await fetch(`${BASE_URL}/api/author/${id}`);
-        const response = await data.json();
-
-        setAuthor(response);
-    };
 
     useEffect(() => {
         getRefs();
@@ -113,7 +104,7 @@ const RefsPage: FC<RefsPageProps> = () => {
         stopTimer();
     };
 
-    const endSession = () => {
+    const endSession = async () => {
         // if images are selected and collection is not
         // if (!!selectedImages.length && !collection) {
         //     console.log('Не выбрана коллекция!');
@@ -127,6 +118,10 @@ const RefsPage: FC<RefsPageProps> = () => {
         }
 
         setFavourites(selectedImages);
+
+        for (const imgId of selectedImages) {
+            await addToCollection(Number(imgId));
+        }
 
         closeCollectionsModal();
         navigate(PathsEnum.main);
@@ -162,6 +157,7 @@ const RefsPage: FC<RefsPageProps> = () => {
                 setSelectedImages(newArr);
             }
         }
+        console.log('selectedImages', selectedImages);
     };
 
     const discardChanges = () => {
@@ -279,13 +275,15 @@ const RefsPage: FC<RefsPageProps> = () => {
                             </StyledFormControl> */}
 
                             <ImageBlock>
-                                {dbRefs.map(({ name: ref }, id) => {
-                                    const isActive = !!selectedImages.find((img) => img === ref);
+                                {allRefs.map(({ name, id }) => {
+                                    const isActive = !!selectedImages.find(
+                                        (img) => img === String(id)
+                                    );
                                     return (
                                         <ImageButton
-                                            key={ref + id}
-                                            id={ref + 'image-button'}
-                                            imgUrl={BASE_URL + ref}
+                                            key={name + id}
+                                            id={id + 'image-button'}
+                                            imgUrl={BASE_URL + name}
                                             isActive={isActive}
                                             onClick={selectImage}
                                         />
