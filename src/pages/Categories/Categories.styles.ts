@@ -11,21 +11,27 @@ export const CategoriesContainer = styled.div`
 `;
 
 export const CategoryItem = styled(Link)`
-    height: 30vh;
+    height: 34vh;
 
     display: flex;
     align-items: center;
     justify-content: center;
     flex: 1 1 33.3333%;
 
-    font-weight: 500;
+    font-weight: 400;
     font-size: 24px;
-    color: ${colors.lightPink};
+    color: ${colors.darkBrown};
     text-align: center;
     text-transform: uppercase;
 
-    border: 4px solid ${colors.dirtyPeach};
-    background-color: ${colors.darkBrown};
+    background-color: ${colors.lightPink};
+    box-shadow: inset 0 0px 5px rgba(255, 191, 181, 0.4);
+    transition: box-shadow 0.2s ease-in-out;
+
+    :hover {
+        box-shadow: inset 0 0px 30px rgba(255, 191, 181, 0.5);
+        transition: box-shadow 0.2s ease-in-out;
+    }
 
     cursor: pointer;
 `;

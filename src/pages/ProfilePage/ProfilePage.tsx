@@ -4,16 +4,11 @@ import { observer } from 'mobx-react-lite';
 
 import { Box, FormControl, InputLabel, OutlinedInput } from '@mui/material';
 import { useUserStore } from '@stores/RootStore/hooks';
-import { UserType } from '@stores/UserStore/UserStore';
+import { InputType, UserInfoType } from '@typings/api';
 
 import { Content, PageTitle, StyledButton } from './ProfilePage.styles';
 
-// todo review types?
-type InputType = 'name' | 'surname' | 'email' | 'username';
-
-type InputsInfoType = Pick<UserType, InputType>;
-
-const inputInfo: InputsInfoType = {
+const inputInfo: UserInfoType = {
     name: 'Имя',
     surname: 'Фамилия',
     email: 'Почта',
@@ -30,7 +25,7 @@ const ProfilePage: FC = () => {
         setUserInfo({ name, surname, username, email });
     }, []);
 
-    const [userInfo, setUserInfo] = useState<InputsInfoType>({
+    const [userInfo, setUserInfo] = useState<UserInfoType>({
         name: '',
         surname: '',
         email: '',
@@ -43,11 +38,10 @@ const ProfilePage: FC = () => {
     };
 
     const save = () => {
-        console.log('edit', userInfo);
         editUser({
-            name: userInfo.name ? userInfo.name : undefined,
-            surname: userInfo.surname ? userInfo.surname : undefined,
-            email: userInfo.email,
+            name: userInfo.name,
+            surname: userInfo.surname,
+            email: userInfo.email ? userInfo.email : undefined,
             username: userInfo.username ? userInfo.username : undefined,
         });
     };

@@ -1,5 +1,5 @@
 import React, { FC, MouseEvent, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
 
@@ -10,7 +10,7 @@ import { Box, Button, IconButton, Modal } from '@mui/material';
 import { PathsEnum } from '@pages/Router';
 import { useAuthStore, useUserStore } from '@stores/RootStore/hooks';
 import { modalBoxStyle } from '@styles/consts';
-import { AuthorType, RefType } from '@typings/api';
+import { RefType } from '@typings/api';
 import useTimer from './useTimer';
 
 import {
@@ -40,23 +40,27 @@ enum ArrowDirection {
 }
 
 const RefsPage: FC<RefsPageProps> = () => {
-    const { getRefs, allRefs, getAuthor, author, setAuthor, addToCollection } = useUserStore();
+    const params = useParams();
 
-    const [dbRefs, setDBRefs] = useState<RefType[]>([]);
+    const { allRefs, getAuthors, author, setAuthor, addToCollection } = useUserStore();
+
+    const [categoryRefs, setCategoryRefs] = useState<RefType[]>([]);
     const [currentImageNum, setCurrentImageNum] = useState(0);
-    const [currentRef, setCurrentRef] = useState(dbRefs[currentImageNum]);
+    const [currentRef, setCurrentRef] = useState(categoryRefs[currentImageNum]);
 
-    const imageAmount = dbRefs.length;
+    const [imageAmount, setImageAmount] = useState(0);
 
     useEffect(() => {
-        getRefs();
-        setDBRefs(allRefs);
-        setCurrentRef(allRefs[0]);
-    }, []);
+        const imgs = allRefs.filter(({ categoryId }) => categoryId === Number(params.id) + 1);
+
+        setCategoryRefs(imgs);
+        setCurrentRef(imgs[0]);
+        setImageAmount(imgs.length);
+    }, [params]);
 
     useEffect(() => {
         if (currentRef && currentRef.authorId) {
-            getAuthor(currentRef.authorId);
+            getAuthors(currentRef.authorId);
         } else {
             setAuthor(null);
         }
@@ -90,7 +94,7 @@ const RefsPage: FC<RefsPageProps> = () => {
                 ? prevImageNumber(imageAmount)
                 : nextImageNumber(imageAmount);
 
-        const currImg = dbRefs[currImgNum];
+        const currImg = categoryRefs[currImgNum];
 
         setCurrentImageNum(currImgNum);
         setCurrentRef(currImg);
@@ -157,7 +161,6 @@ const RefsPage: FC<RefsPageProps> = () => {
                 setSelectedImages(newArr);
             }
         }
-        console.log('selectedImages', selectedImages);
     };
 
     const discardChanges = () => {
@@ -167,7 +170,7 @@ const RefsPage: FC<RefsPageProps> = () => {
     };
 
     const handleCloseButton = () => {
-        if (isAuthenticated) {
+        if (isAuthenticated && imageAmount) {
             openCollectionsModal();
         } else {
             navigate(PathsEnum.main);
@@ -209,7 +212,7 @@ const RefsPage: FC<RefsPageProps> = () => {
                 <IconButton
                     size="large"
                     onClick={handleChangeRefClick(ArrowDirection.next)}
-                    disabled={currentImageNum === imageAmount - 1}
+                    disabled={currentImageNum === imageAmount - 1 || !imageAmount}
                 >
                     <ArrowRight />
                 </IconButton>
@@ -275,7 +278,7 @@ const RefsPage: FC<RefsPageProps> = () => {
                             </StyledFormControl> */}
 
                             <ImageBlock>
-                                {allRefs.map(({ name, id }) => {
+                                {categoryRefs.map(({ name, id }) => {
                                     const isActive = !!selectedImages.find(
                                         (img) => img === String(id)
                                     );

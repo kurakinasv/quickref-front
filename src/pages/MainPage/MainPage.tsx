@@ -10,7 +10,7 @@ import Modal from '@mui/material/Modal';
 import Typography from '@mui/material/Typography';
 import { collections } from '@pages/RefsPage/mock';
 import { PathsEnum } from '@pages/Router';
-import { useAuthStore, useUserStore } from '@stores/RootStore/hooks';
+import { useAuthStore } from '@stores/RootStore/hooks';
 import { modalBoxStyle } from '@styles/consts';
 
 import {
@@ -33,7 +33,7 @@ const MainPage = () => {
 
     const { open, openModal, closeModal } = useModal();
 
-    const [value, setValue] = useState({ email: 'admin2@qwe.com', password: '12345qwe' });
+    const [value, setValue] = useState({ email: '', password: '' });
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         const { name, value } = event.target;

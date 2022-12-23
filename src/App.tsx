@@ -8,14 +8,19 @@ import { useAuthStore, useUserStore } from '@stores/RootStore/hooks';
 
 const App = () => {
     const { initUser, isAuthenticated } = useAuthStore();
-    const { getUser } = useUserStore();
+    const { getUser, getRefs } = useUserStore();
 
-    useEffect(() => {
+    const init = async () => {
         initUser();
+        await getRefs();
 
         if (isAuthenticated) {
-            getUser();
+            await getUser();
         }
+    };
+
+    useEffect(() => {
+        init();
     }, [isAuthenticated]);
 
     return (

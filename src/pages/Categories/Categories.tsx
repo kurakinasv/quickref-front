@@ -9,7 +9,7 @@ const Categories: FC = () => {
     return (
         <CategoriesContainer>
             {Object.values(categoryNames).map((cat, i) => (
-                <CategoryItem key={i + cat} to={PathsEnum.refs}>
+                <CategoryItem key={i + cat} to={`${PathsEnum.refs}/${i}`}>
                     {cat}
                 </CategoryItem>
             ))}

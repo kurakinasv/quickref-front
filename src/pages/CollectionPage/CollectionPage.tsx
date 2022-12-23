@@ -20,7 +20,7 @@ import {
 } from './CollectionPage.styles';
 
 const CollectionPage: FC = () => {
-    const { allRefs, getRefs, getAuthor, author, favImages, getCollection } = useUserStore();
+    const { allRefs, getAuthors, author, favImages, getCollection } = useUserStore();
 
     useEffect(() => {
         getCollection();
@@ -30,17 +30,9 @@ const CollectionPage: FC = () => {
 
     const [currentImage, setCurrentImage] = useState('');
 
-    const getAllRefs = async () => {
-        await getRefs();
-    };
-
     const getAuthorInfo = async (id: number) => {
-        await getAuthor(id);
+        await getAuthors(id);
     };
-
-    useEffect(() => {
-        getAllRefs();
-    }, []);
 
     const currentInfo = useMemo(() => {
         const found = allRefs.find(({ name }) => name === currentImage);

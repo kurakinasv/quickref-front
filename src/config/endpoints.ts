@@ -5,7 +5,7 @@ enum HttpMetods {
 }
 
 const endpoints = {
-    // auth & user
+    // auth
     auth: {
         method: HttpMetods.GET,
         url: '/user/auth',
@@ -18,6 +18,12 @@ const endpoints = {
         method: HttpMetods.POST,
         url: '/user/register',
     },
+
+    // user
+    getUser: {
+        method: HttpMetods.GET,
+        url: '/user/',
+    },
     editStatus: {
         method: HttpMetods.POST,
         url: '/user/editStatus',
@@ -26,13 +32,37 @@ const endpoints = {
         method: HttpMetods.POST,
         url: '/user/edit',
     },
-    getUser: {
+
+    // images
+    getImages: {
         method: HttpMetods.GET,
-        url: '/user/',
+        url: '/image/images',
     },
+    uploadImage: {
+        method: HttpMetods.POST,
+        url: '/image/upload',
+    },
+    addToCollection: {
+        method: HttpMetods.POST,
+        url: '/image/add',
+    },
+
+    // colllections
     getCollections: {
         method: HttpMetods.GET,
         url: '/collection/',
+    },
+
+    // authors
+    getAuthors: {
+        method: HttpMetods.GET,
+        url: '/author/',
+    },
+
+    // categories
+    getCategories: {
+        method: HttpMetods.GET,
+        url: '/category/',
     },
 };
 

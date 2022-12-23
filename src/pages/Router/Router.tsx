@@ -64,6 +64,10 @@ const Router: FC = () => {
             element: <RefsPage />,
         },
         {
+            path: `${PathsEnum.refs}/:id`,
+            element: <RefsPage />,
+        },
+        {
             path: '*',
             element: <Navigate to={PathsEnum.main} replace />,
         },
