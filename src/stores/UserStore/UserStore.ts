@@ -1,8 +1,9 @@
 import { makeAutoObservable, toJS } from 'mobx';
 
-import { headers } from '@config/api';
+import { BASE_URL, headers } from '@config/api';
 import endpoints from '@config/endpoints';
 import RootStore from '@stores/RootStore';
+import { AuthorType, RefType } from '@typings/api';
 import { formUrl } from '@utils/formUrl';
 import { getAuthHeader } from '@utils/getAuthHeader';
 
@@ -28,10 +29,20 @@ class UserStore {
     private _user = {} as UserType;
     private _userId: number | null = null;
     private _favourites: string[] = [];
+    private _author: AuthorType | null = null;
+    private _allRefs: RefType[] = [];
 
     constructor(rootStore: RootStore) {
         makeAutoObservable<this, PrivateFields>(this);
         this.rootStore = rootStore;
+    }
+
+    get allRefs() {
+        return this._allRefs;
+    }
+
+    get author() {
+        return this._author;
     }
 
     get token() {
@@ -60,6 +71,14 @@ class UserStore {
 
     setFavourites = (favs: string[]) => {
         this._favourites = [...this._favourites, ...favs];
+    };
+
+    setAuthor = (author: AuthorType) => {
+        this._author = author;
+    };
+
+    setAllRefs = (refs: RefType[]) => {
+        this._allRefs = refs;
     };
 
     getUser = async () => {
@@ -109,8 +128,6 @@ class UserStore {
         const url = formUrl(endpoints.editUser.url);
 
         try {
-            console.log();
-
             const response = await fetch(url, {
                 method: endpoints.editUser.method,
                 body: JSON.stringify({ id: this.userId, name, surname, email, username }),
@@ -129,6 +146,75 @@ class UserStore {
             throw Error(`editUser: ${err.message}`);
         }
     };
+
+    getCollection = async () => {
+        // todo delete mock id
+        const url = formUrl(`${endpoints.getCollections.url}/2`);
+
+        try {
+            const response = await fetch(url, {
+                method: endpoints.getCollections.method,
+                headers: { ...headers, ...getAuthHeader(this.token) },
+            });
+
+            const data: { collection: any; imgCol: ImageCollectionType[] } = await response.json();
+
+            if (data) {
+                await this.getRefs();
+                console.log(data);
+                const { imgCol } = data;
+                const arrId = imgCol.map(({ imageId }) => imageId);
+                const favs = this.allRefs
+                    .filter((ref) => arrId.includes(ref.id))
+                    .map((ref) => ref.name);
+                this.setFavourites(favs);
+            }
+        } catch (err: any) {
+            throw Error(`getCollection: ${err.message}`);
+        }
+    };
+
+    getRefs = async () => {
+        try {
+            const response = await fetch(`${BASE_URL}api/image/images`, {
+                method: 'GET',
+                headers,
+            });
+            const data: RefType[] = await response.json();
+
+            if (data) {
+                this.setAllRefs(data);
+                console.log(data.map((ref) => ref.name));
+
+                this.setFavourites(data.map((ref) => ref.name));
+            }
+        } catch (err: any) {
+            throw Error(`getRefs: ${err.message}`);
+        }
+    };
+
+    getAuthor = async (id: number) => {
+        try {
+            const response = await fetch(`${BASE_URL}/api/author/${id}`, {
+                method: 'GET',
+                headers,
+            });
+            const data = await response.json();
+
+            if (data) {
+                this.setAuthor(data);
+            }
+        } catch (err: any) {
+            throw Error(`getAuthor: ${err.message}`);
+        }
+    };
 }
+
+type ImageCollectionType = {
+    collectionId: number;
+    createdAt: string;
+    imageId: number;
+    updatedAt: string;
+};
 
 export default UserStore;

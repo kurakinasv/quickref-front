@@ -30,6 +30,10 @@ const endpoints = {
         method: HttpMetods.GET,
         url: '/user/',
     },
+    getCollections: {
+        method: HttpMetods.GET,
+        url: '/collection/',
+    },
 };
 
 export default endpoints;

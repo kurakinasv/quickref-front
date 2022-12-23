@@ -1,11 +1,11 @@
-import React, { FC, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { observer } from 'mobx-react-lite';
 
+import { BASE_URL } from '@config/api';
 import useModal from '@hooks/useModal';
 import { Close } from '@mui/icons-material';
 import { Box, Grid, IconButton, Modal, TextField } from '@mui/material';
-import { refsInfo } from '@pages/RefsPage/mock';
 import { useUserStore } from '@stores/RootStore/hooks';
 import { modalBoxStyle } from '@styles/consts';
 
@@ -20,19 +20,35 @@ import {
 } from './CollectionPage.styles';
 
 const CollectionPage: FC = () => {
-    const { favourites } = useUserStore();
+    const { allRefs, getRefs, getAuthor, author } = useUserStore();
 
     const { open, openModal, closeModal } = useModal();
 
     const [currentImage, setCurrentImage] = useState('');
 
-    const currentInfo = useMemo(
-        () => Object.entries(refsInfo)?.find(([key]) => key === currentImage)?.[1],
-        [currentImage]
-    );
+    const getAllRefs = async () => {
+        await getRefs();
+    };
+
+    const getAuthorInfo = async (id: number) => {
+        await getAuthor(id);
+    };
+
+    useEffect(() => {
+        getAllRefs();
+    }, []);
+
+    const currentInfo = useMemo(() => {
+        const found = allRefs.find(({ name }) => name === currentImage);
+        const source = found?.source;
+        if (found && found.authorId) {
+            getAuthorInfo(found.authorId);
+        }
+        return { source, author: author?.nickname };
+    }, [currentImage]);
 
     const handleClick = (e: React.SyntheticEvent<HTMLDivElement>) => {
-        const url = e.currentTarget.dataset.url?.valueOf();
+        const url = e.currentTarget.dataset.url;
 
         if (url) {
             setCurrentImage(url);
@@ -71,10 +87,14 @@ const CollectionPage: FC = () => {
                 />
 
                 <Grid container columns={5} rowSpacing={2} columnSpacing={{ xs: 2, md: 2 }}>
-                    {Object.values(favourites).map((ref, id) => {
+                    {allRefs.map((ref, id) => {
                         return (
-                            <Grid item xs={1} key={ref + id} justifyContent="center">
-                                <ImageItem imgUrl={ref} data-url={ref} onClick={handleClick} />
+                            <Grid item xs={1} key={ref.name + id} justifyContent="center">
+                                <ImageItem
+                                    imgUrl={BASE_URL + ref.name}
+                                    data-url={ref.name}
+                                    onClick={handleClick}
+                                />
                             </Grid>
                         );
                     })}
@@ -92,10 +112,12 @@ const CollectionPage: FC = () => {
                         >
                             <Close />
                         </IconButton>
-                        <InfoItem>
-                            <ItemTitle>Автор</ItemTitle>
-                            <ItemData>{currentInfo ? currentInfo.author : ''}</ItemData>
-                        </InfoItem>
+                        {currentInfo.author && (
+                            <InfoItem>
+                                <ItemTitle>Автор</ItemTitle>
+                                <ItemData>{currentInfo.author}</ItemData>
+                            </InfoItem>
+                        )}
                         <InfoItem>
                             <ItemTitle>Источник</ItemTitle>
                             <ItemData>{currentInfo ? currentInfo.source : ''}</ItemData>

@@ -64,4 +64,5 @@ export const ItemData = styled.span`
     font-size: 24px;
     color: ${colors.darkBrown};
     font-weight: 500;
+    word-break: break-all;
 `;

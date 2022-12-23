@@ -40,21 +40,13 @@ enum ArrowDirection {
 }
 
 const RefsPage: FC<RefsPageProps> = () => {
+    const { getRefs, allRefs } = useUserStore();
+
     const [dbRefs, setDBRefs] = useState<RefType[]>([]);
     const [currentImageNum, setCurrentImageNum] = useState(0);
     const [currentRef, setCurrentRef] = useState(dbRefs[currentImageNum]);
 
     const imageAmount = dbRefs.length;
-
-    const getRefs = async () => {
-        const data = await fetch(`${BASE_URL}api/image/images`);
-        const response: RefType[] = await data.json();
-
-        if (response) {
-            setDBRefs(response);
-            setCurrentRef(response[0]);
-        }
-    };
 
     const [author, setAuthor] = useState<AuthorType | null>(null);
 
@@ -67,6 +59,8 @@ const RefsPage: FC<RefsPageProps> = () => {
 
     useEffect(() => {
         getRefs();
+        setDBRefs(allRefs);
+        setCurrentRef(allRefs[0]);
     }, []);
 
     useEffect(() => {
