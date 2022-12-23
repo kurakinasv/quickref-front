@@ -26,28 +26,23 @@ import {
 } from './MainPage.styles';
 
 const MainPage = () => {
-    const { isAuthenticated, loginHandler, registerHandler, logoutHandler, initUser } =
+    const { isAuthenticated, isAdmin, loginHandler, logoutHandler, registerHandler } =
         useAuthStore();
-    const { isAdmin } = useUserStore();
-
-    useEffect(() => {
-        initUser();
-    }, []);
 
     const [isRegistered, setIsRegistered] = useState(true);
 
     const { open, openModal, closeModal } = useModal();
 
-    const [value, setValue] = useState({ email: '', password: '' });
+    const [value, setValue] = useState({ email: 'admin2@qwe.com', password: '12345qwe' });
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         const { name, value } = event.target;
         setValue((val) => ({ ...val, [name]: value }));
     };
 
-    const handleLogin = () => {
+    const handleLogin = async () => {
         const { email, password } = value;
-        isRegistered ? loginHandler(email, password) : registerHandler(email, password);
+        isRegistered ? await loginHandler(email, password) : await registerHandler(email, password);
         closeModal();
     };
 

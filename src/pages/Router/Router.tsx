@@ -9,7 +9,7 @@ import CollectionPage from '@pages/CollectionPage';
 import MainPage from '@pages/MainPage';
 import ProfilePage from '@pages/ProfilePage';
 import RefsPage from '@pages/RefsPage';
-import { useAuthStore, useUserStore } from '@stores/RootStore/hooks';
+import { useAuthStore } from '@stores/RootStore/hooks';
 
 export enum PathsEnum {
     main = '/',
@@ -20,8 +20,7 @@ export enum PathsEnum {
 }
 
 const Router: FC = () => {
-    const { isAuthenticated } = useAuthStore();
-    const { isAdmin } = useUserStore();
+    const { isAuthenticated, isAdmin } = useAuthStore();
 
     const authChildrenRoutes = isAuthenticated
         ? [

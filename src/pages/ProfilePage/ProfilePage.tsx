@@ -1,16 +1,17 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 
 import { observer } from 'mobx-react-lite';
 
 import { Box, FormControl, InputLabel, OutlinedInput } from '@mui/material';
-import { useUserStore } from '@stores/RootStore/hooks';
+import { useAuthStore } from '@stores/RootStore/hooks';
+import { UserType } from '@stores/UserStore/UserStore';
 
 import { Content, PageTitle, StyledButton } from './ProfilePage.styles';
 
 // todo review types?
 type InputType = 'name' | 'surname' | 'email' | 'username';
 
-type InputsInfoType = Record<InputType, string>;
+type InputsInfoType = Pick<UserType, InputType>;
 
 const inputInfo: InputsInfoType = {
     name: 'Имя',
@@ -20,13 +21,20 @@ const inputInfo: InputsInfoType = {
 };
 
 const ProfilePage: FC = () => {
-    const { userName, surname, email, nickname, updateUserInfo } = useUserStore();
+    const {
+        user: { name, surname, username, email },
+        editUser,
+    } = useAuthStore();
+
+    useEffect(() => {
+        setUserInfo({ name, surname, username, email });
+    }, []);
 
     const [userInfo, setUserInfo] = useState<InputsInfoType>({
-        name: userName,
-        surname: surname,
-        email: email,
-        username: nickname,
+        name: '',
+        surname: '',
+        email: '',
+        username: '',
     });
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
@@ -35,8 +43,13 @@ const ProfilePage: FC = () => {
     };
 
     const save = () => {
-        console.log('saved', JSON.stringify(userInfo));
-        updateUserInfo(userInfo);
+        console.log('edit', userInfo);
+        editUser({
+            name: userInfo.name ? userInfo.name : undefined,
+            surname: userInfo.surname ? userInfo.surname : undefined,
+            email: userInfo.email,
+            username: userInfo.username ? userInfo.username : undefined,
+        });
     };
 
     return (
@@ -50,7 +63,7 @@ const ProfilePage: FC = () => {
                         <FormControl key={i + key}>
                             <InputLabel htmlFor={id}>{val}</InputLabel>
                             <OutlinedInput
-                                value={userInfo[key as InputType]}
+                                value={userInfo[key as InputType] || ''}
                                 id={id}
                                 name={key}
                                 onChange={handleChange}
@@ -59,7 +72,6 @@ const ProfilePage: FC = () => {
                         </FormControl>
                     );
                 })}
-
                 <StyledButton variant="contained" size="large" onClick={save}>
                     Сохранить
                 </StyledButton>

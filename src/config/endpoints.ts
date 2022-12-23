@@ -26,6 +26,10 @@ const endpoints = {
         method: HttpMetods.POST,
         url: '/user/edit',
     },
+    getUser: {
+        method: HttpMetods.GET,
+        url: '/user/',
+    },
 };
 
 export default endpoints;
