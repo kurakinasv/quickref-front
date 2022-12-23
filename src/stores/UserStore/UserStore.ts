@@ -3,14 +3,7 @@ import { makeAutoObservable } from 'mobx';
 import { headers } from '@config/api';
 import endpoints from '@config/endpoints';
 import RootStore from '@stores/RootStore';
-import {
-    AuthorType,
-    CategoryType,
-    ImageCollectionType,
-    RefType,
-    UserInfoType,
-    UserType,
-} from '@typings/api';
+import { AuthorType, CategoryType, UserInfoType, UserType } from '@typings/api';
 import { formUrl } from '@utils/formUrl';
 import { getAuthHeader } from '@utils/getAuthHeader';
 
@@ -21,20 +14,13 @@ class UserStore {
 
     private _user = {} as UserType;
     private _userId: number | null = null;
-    private _favourites: string[] = [];
     private _author: AuthorType | null = null;
     private _authors: AuthorType[] = [];
-    private _allRefs: RefType[] = [];
     private _categories: CategoryType[] = [];
-    private _favImages: RefType[] = [];
 
     constructor(rootStore: RootStore) {
         makeAutoObservable<this, PrivateFields>(this);
         this.rootStore = rootStore;
-    }
-
-    get allRefs() {
-        return this._allRefs;
     }
 
     get author() {
@@ -57,14 +43,6 @@ class UserStore {
         return this._userId;
     }
 
-    get favourites() {
-        return this._favourites;
-    }
-
-    get favImages() {
-        return this._favImages;
-    }
-
     get categories() {
         return this._categories;
     }
@@ -77,16 +55,8 @@ class UserStore {
         this._userId = id;
     };
 
-    setFavourites = (favs: string[]) => {
-        this._favourites = [...this._favourites, ...favs];
-    };
-
     setCategories = (categories: CategoryType[]) => {
         this._categories = categories;
-    };
-
-    setFavImages = (favs: RefType[]) => {
-        this._favImages = favs;
     };
 
     setAuthor = (author: AuthorType | null) => {
@@ -95,10 +65,6 @@ class UserStore {
 
     setAllAuthors = (authors: AuthorType[]) => {
         this._authors = authors;
-    };
-
-    setAllRefs = (refs: RefType[]) => {
-        this._allRefs = refs;
     };
 
     getUser = async () => {
@@ -163,52 +129,6 @@ class UserStore {
         }
     };
 
-    getCollection = async (id?: number) => {
-        const url = formUrl(`${endpoints.getCollections.url}/${id || 'fav'}`);
-
-        try {
-            const response = await fetch(url, {
-                method: endpoints.getCollections.method,
-                headers: { ...headers, ...getAuthHeader(this.token) },
-            });
-
-            const data: { collection: any; imgCol: ImageCollectionType[] } = await response.json();
-
-            if (data) {
-                await this.getRefs();
-                const { imgCol } = data; // [{imageId: 3, ...}, {}...]
-
-                const arrId = imgCol.map(({ imageId }) => imageId);
-
-                const favs = this.allRefs.filter((ref) => arrId.includes(ref.id));
-                this.setFavImages(favs);
-
-                this.setFavourites(favs.map((ref) => ref.name));
-            }
-        } catch (err: any) {
-            throw Error(`getCollection: ${err.message}`);
-        }
-    };
-
-    getRefs = async () => {
-        const url = formUrl(endpoints.getImages.url);
-
-        try {
-            const response = await fetch(url, {
-                method: endpoints.getImages.method,
-                headers,
-            });
-            const data: RefType[] = await response.json();
-
-            if (data) {
-                this.setAllRefs(data);
-                this.setFavourites(data.map((ref) => ref.name));
-            }
-        } catch (err: any) {
-            throw Error(`getRefs: ${err.message}`);
-        }
-    };
-
     getAuthors = async (id?: number) => {
         const url = formUrl(endpoints.getAuthors.url);
 
@@ -228,70 +148,6 @@ class UserStore {
             }
         } catch (err: any) {
             throw Error(`getAuthors: ${err.message}`);
-        }
-    };
-
-    findAuthorByNickName = async (nick: string) => {
-        await this.getAuthors();
-        return this.authors.find((a) => a.nickname === nick);
-    };
-
-    uploadImage = async (
-        date_upload: Date,
-        source: string,
-        categoryId: number,
-        nickname: string,
-        name: File
-    ) => {
-        const url = formUrl(endpoints.uploadImage.url);
-
-        try {
-            const author = await this.findAuthorByNickName(nickname);
-
-            const toSend = new FormData();
-            toSend.append('files', name);
-            toSend.append(
-                'info',
-                JSON.stringify({
-                    date_upload,
-                    source,
-                    categoryId: categoryId + 1,
-                    authorId: author?.id,
-                })
-            );
-
-            const response = await fetch(url, {
-                method: endpoints.uploadImage.method,
-                body: toSend,
-                headers: getAuthHeader(this.token),
-            });
-            const data: RefType[] = await response.json();
-
-            if (!data) {
-                throw new Error('Не удалось загрузить изображение');
-            }
-        } catch (err: any) {
-            throw Error(`getRefs: ${err.message}`);
-        }
-    };
-
-    addToCollection = async (imageId: number) => {
-        const url = formUrl(endpoints.addToCollection.url);
-
-        try {
-            const id = imageId;
-            const response = await fetch(url, {
-                method: endpoints.addToCollection.url,
-                body: JSON.stringify({ id, collectionId: null }),
-                headers: { ...headers, ...getAuthHeader(this.token) },
-            });
-            const data: RefType[] = await response.json();
-
-            if (!data) {
-                throw new Error('Не удалось добавить в коллекцию');
-            }
-        } catch (err: any) {
-            throw Error(`addToCollection: ${err.message}`);
         }
     };
 

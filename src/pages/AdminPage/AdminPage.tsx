@@ -1,18 +1,16 @@
 import React, { FC, useState } from 'react';
 
-import { BASE_URL, headers } from '@config/api';
 import { categoriesInfo } from '@config/categories';
 import { FileUploadOutlined } from '@mui/icons-material';
 import {
     FormControl,
-    Input,
     InputLabel,
     MenuItem,
     OutlinedInput,
     Select,
     SelectChangeEvent,
 } from '@mui/material';
-import { useUserStore } from '@stores/RootStore/hooks';
+import { useRefStore } from '@stores/RootStore/hooks';
 
 import {
     Content,
@@ -27,10 +25,9 @@ import {
 } from './AdminPage.styles';
 
 const AdminPage: FC = () => {
-    const { uploadImage } = useUserStore();
+    const { uploadImage } = useRefStore();
 
     const [value, setValue] = useState({
-        // fileName: '',
         source: '',
         nickname: '',
         name: '',
@@ -59,11 +56,8 @@ const AdminPage: FC = () => {
         setCategory(event.target.value);
     };
 
-    // todo add image uploading
     const sendToDB = async () => {
         const cat = Number(category);
-        console.log('...sending', { ...value, cat });
-        console.log('image', image);
 
         if (image) {
             await uploadImage(new Date(), value.source, cat, value.nickname, image);

@@ -25,13 +25,13 @@ export const PageTitle = styled.h1`
 `;
 
 export const Form = styled.div`
-    width: 80vw;
+    width: 65vw;
     display: flex;
     gap: 70px;
 `;
 
 export const UploadImage = styled.div`
-    width: 375px;
+    width: 500px;
     height: 470px;
 
     display: flex;

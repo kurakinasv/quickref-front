@@ -8,7 +8,12 @@ import useModal from '@hooks/useModal';
 import { ArrowLeft, ArrowRight, Close, InfoOutlined } from '@mui/icons-material';
 import { Box, Button, IconButton, Modal } from '@mui/material';
 import { PathsEnum } from '@pages/Router';
-import { useAuthStore, useUserStore } from '@stores/RootStore/hooks';
+import {
+    useAuthStore,
+    useCollectionStore,
+    useRefStore,
+    useUserStore,
+} from '@stores/RootStore/hooks';
 import { modalBoxStyle } from '@styles/consts';
 import { RefType } from '@typings/api';
 import useTimer from './useTimer';
@@ -42,7 +47,10 @@ enum ArrowDirection {
 const RefsPage: FC<RefsPageProps> = () => {
     const params = useParams();
 
-    const { allRefs, getAuthors, author, setAuthor, addToCollection } = useUserStore();
+    const { getAuthors, author, setAuthor } = useUserStore();
+    const { isAuthenticated } = useAuthStore();
+    const { setFavourites } = useCollectionStore();
+    const { allRefs, addToCollection } = useRefStore();
 
     const [categoryRefs, setCategoryRefs] = useState<RefType[]>([]);
     const [currentImageNum, setCurrentImageNum] = useState(0);
@@ -67,9 +75,6 @@ const RefsPage: FC<RefsPageProps> = () => {
     }, [currentRef]);
 
     const navigate = useNavigate();
-
-    const { isAuthenticated } = useAuthStore();
-    const { setFavourites } = useUserStore();
 
     const { open, openModal, closeModal } = useModal();
     const {

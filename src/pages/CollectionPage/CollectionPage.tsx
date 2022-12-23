@@ -6,7 +6,7 @@ import { BASE_URL } from '@config/api';
 import useModal from '@hooks/useModal';
 import { Close } from '@mui/icons-material';
 import { Box, Grid, IconButton, Modal, TextField } from '@mui/material';
-import { useUserStore } from '@stores/RootStore/hooks';
+import { useCollectionStore, useRefStore, useUserStore } from '@stores/RootStore/hooks';
 import { modalBoxStyle } from '@styles/consts';
 
 import {
@@ -20,7 +20,9 @@ import {
 } from './CollectionPage.styles';
 
 const CollectionPage: FC = () => {
-    const { allRefs, getAuthors, author, favImages, getCollection } = useUserStore();
+    const { getAuthors, author } = useUserStore();
+    const { favImages, getCollection } = useCollectionStore();
+    const { allRefs } = useRefStore();
 
     useEffect(() => {
         getCollection();
