@@ -3,14 +3,28 @@ import React, { FC, useEffect, useMemo, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { BASE_URL } from '@config/api';
+import { categoriesInfo } from '@config/categories';
 import useModal from '@hooks/useModal';
 import { Close } from '@mui/icons-material';
-import { Box, Grid, IconButton, Modal, TextField } from '@mui/material';
-import { useAuthorsStore, useCollectionStore, useRefStore } from '@stores/RootStore/hooks';
+import {
+    Box,
+    FormControl,
+    Grid,
+    IconButton,
+    InputLabel,
+    MenuItem,
+    Modal,
+    Select,
+    SelectChangeEvent,
+    TextField,
+} from '@mui/material';
+import { useAuthorsStore, useCollectionStore } from '@stores/RootStore/hooks';
 import { modalBoxStyle } from '@styles/consts';
+import { RefType } from '@typings/api';
 
 import {
     Content,
+    FilterBlock,
     ImageItem,
     InfoItem,
     ItemData,
@@ -20,13 +34,17 @@ import {
 } from './CollectionPage.styles';
 
 const CollectionPage: FC = () => {
-    const { getAuthors, author } = useAuthorsStore();
+    const { getAuthors, authors } = useAuthorsStore();
     const { favImages, getCollection, editCollection, description } = useCollectionStore();
-    const { allRefs } = useRefStore();
 
     useEffect(() => {
         getCollection();
+        getAuthors();
     }, []);
+
+    useEffect(() => {
+        setFiltered(favImages);
+    }, [favImages]);
 
     useEffect(() => {
         setTempValue(description);
@@ -36,16 +54,11 @@ const CollectionPage: FC = () => {
 
     const [currentImage, setCurrentImage] = useState('');
 
-    const getAuthorInfo = async (id: number) => {
-        await getAuthors(id);
-    };
-
     const currentInfo = useMemo(() => {
-        const found = allRefs.find(({ name }) => name === currentImage);
+        const found = favImages.find(({ name }) => name === currentImage);
         const source = found?.source;
-        if (found && found.authorId) {
-            getAuthorInfo(found.authorId);
-        }
+        const author = authors.find(({ id }) => id === found?.authorId);
+
         return { source, author: author?.nickname };
     }, [currentImage]);
 
@@ -69,6 +82,63 @@ const CollectionPage: FC = () => {
         await editCollection(tempValue);
     };
 
+    const [category, setCategory] = useState('');
+    const [filtered, setFiltered] = useState<RefType[]>(favImages);
+
+    const onSelectChange = (event: SelectChangeEvent) => {
+        const catId = event.target.value;
+        setCategory(catId);
+        filterImages(searchValue, catId);
+    };
+
+    const [searchValue, setSearchValue] = useState('');
+
+    const handleSearch = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
+        const val = event.target.value;
+        setSearchValue(val);
+        filterImages(val, category);
+    };
+
+    const filterImages = (searchValue: string, category: string) => {
+        if (!searchValue && !category) {
+            setFiltered(favImages);
+            return;
+        }
+
+        if (!searchValue && category) {
+            const filteredByCategory = favImages.filter(
+                ({ categoryId }) => categoryId === Number(category) + 1
+            );
+            setFiltered(filteredByCategory);
+            return;
+        }
+
+        const valLength = searchValue.length;
+
+        const foundAuthors = authors.filter(({ nickname }) => {
+            const substring = nickname.substring(0, valLength).toLowerCase();
+            return substring === searchValue.toLowerCase();
+        });
+
+        const authorsIds = foundAuthors.map((v) => v.id);
+
+        let filteredImg = favImages;
+
+        if (searchValue && !category) {
+            filteredImg = favImages.filter(({ authorId }) =>
+                authorId ? authorsIds.includes(authorId) : null
+            );
+        }
+
+        if (searchValue && category) {
+            filteredImg = filtered.filter(({ authorId }) =>
+                authorId ? authorsIds.includes(authorId) : null
+            );
+        }
+
+        setFiltered(filteredImg);
+    };
+
     return (
         <>
             <Content>
@@ -86,8 +156,40 @@ const CollectionPage: FC = () => {
                     sx={{ width: '35vw' }}
                 />
 
+                <FilterBlock>
+                    <TextField
+                        id="outlined-search"
+                        label="Поиск по автору"
+                        type="search"
+                        size="small"
+                        sx={{ width: '300px' }}
+                        value={searchValue}
+                        onChange={handleSearch}
+                    />
+                    <FormControl sx={{ width: '300px' }}>
+                        <InputLabel id="category-select-label">Категория</InputLabel>
+                        <Select
+                            size="small"
+                            labelId="category-select-label"
+                            label="Category"
+                            value={category}
+                            onChange={onSelectChange}
+                            variant="outlined"
+                        >
+                            <MenuItem key="none" value="">
+                                Не выбрано
+                            </MenuItem>
+                            {Object.entries(categoriesInfo).map(([key, { id, name }]) => (
+                                <MenuItem key={id} value={String(id)}>
+                                    {name}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </FilterBlock>
+
                 <Grid container columns={5} rowSpacing={2} columnSpacing={{ xs: 2, md: 2 }}>
-                    {favImages.map(({ name }, id) => {
+                    {filtered.map(({ name }, id) => {
                         return (
                             <Grid item xs={1} key={name + id} justifyContent="center">
                                 <ImageItem

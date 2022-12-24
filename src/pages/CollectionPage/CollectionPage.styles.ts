@@ -8,12 +8,23 @@ export const Content = styled.div`
     justify-content: center;
     align-items: center;
     gap: 50px;
+
+    // to rise a little small sized label
+    .css-14s5rfu-MuiFormLabel-root-MuiInputLabel-root {
+        transform: translate(14px, 9px) scale(1);
+    }
 `;
 
 export const PageTitle = styled.h1`
     font-weight: 400;
     font-size: 36px;
     text-align: center;
+`;
+
+export const FilterBlock = styled.div`
+    width: 90vw;
+    display: flex;
+    justify-content: space-between;
 `;
 
 export const ImageItem = styled.div<{ imgUrl: string }>`
