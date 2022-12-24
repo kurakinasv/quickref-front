@@ -1,16 +1,20 @@
-import React, { FC, useState } from 'react';
+import React, { FC, useEffect, useState } from 'react';
+
+import { observer } from 'mobx-react-lite';
 
 import { categoriesInfo } from '@config/categories';
 import { FileUploadOutlined } from '@mui/icons-material';
 import {
+    Alert,
     FormControl,
     InputLabel,
     MenuItem,
     OutlinedInput,
     Select,
     SelectChangeEvent,
+    Snackbar,
 } from '@mui/material';
-import { useRefStore } from '@stores/RootStore/hooks';
+import { useMeta, useRefStore } from '@stores/RootStore/hooks';
 
 import {
     Content,
@@ -26,6 +30,7 @@ import {
 
 const AdminPage: FC = () => {
     const { uploadImage } = useRefStore();
+    const { isError } = useMeta();
 
     const [value, setValue] = useState({
         source: '',
@@ -34,6 +39,12 @@ const AdminPage: FC = () => {
         surname: '',
         socialMedia: '',
     });
+
+    const [open, setOpen] = useState(false);
+
+    useEffect(() => {
+        setOpen(isError);
+    }, [isError]);
 
     const [image, setImage] = useState<File | null>(null);
 
@@ -54,6 +65,10 @@ const AdminPage: FC = () => {
 
     const onSelectChange = (event: SelectChangeEvent) => {
         setCategory(event.target.value);
+    };
+
+    const handleClose = () => {
+        setOpen(false);
     };
 
     const sendToDB = async () => {
@@ -93,14 +108,6 @@ const AdminPage: FC = () => {
                 <InfoPanel>
                     <InfoPanelItem>
                         <SubTitle>Изображение</SubTitle>
-                        {/* <OutlinedInput
-                            fullWidth={true}
-                            size="small"
-                            placeholder="Имя файла"
-                            name="fileName"
-                            onChange={handleChange}
-                            value={value.fileName}
-                        /> */}
                         <OutlinedInput
                             fullWidth={true}
                             size="small"
@@ -142,30 +149,6 @@ const AdminPage: FC = () => {
                             onChange={handleChange}
                             value={value.nickname}
                         />
-                        {/* <OutlinedInput
-                            fullWidth={true}
-                            size="small"
-                            placeholder="Имя"
-                            name="name"
-                            onChange={handleChange}
-                            value={value.name}
-                        />
-                        <OutlinedInput
-                            fullWidth={true}
-                            size="small"
-                            placeholder="Фамилия"
-                            name="surname"
-                            onChange={handleChange}
-                            value={value.surname}
-                        />
-                        <OutlinedInput
-                            fullWidth={true}
-                            size="small"
-                            placeholder="Медиа"
-                            name="socialMedia"
-                            onChange={handleChange}
-                            value={value.socialMedia}
-                        /> */}
                     </InfoPanelItem>
                 </InfoPanel>
             </Form>
@@ -173,8 +156,24 @@ const AdminPage: FC = () => {
             <StyledButton variant="contained" size="large" fullWidth={false} onClick={sendToDB}>
                 Добавить в базу данных
             </StyledButton>
+
+            <Snackbar
+                open={open}
+                autoHideDuration={4500}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+            >
+                <Alert
+                    onClose={handleClose}
+                    severity="error"
+                    sx={{ width: '100%' }}
+                    variant="filled"
+                >
+                    Произошла ошибка при отправке данных
+                </Alert>
+            </Snackbar>
         </Content>
     );
 };
 
-export default AdminPage;
+export default observer(AdminPage);

@@ -60,7 +60,7 @@ class RefStore {
         const url = formUrl(endpoints.uploadImage.url);
 
         try {
-            const author = await this.findAuthorByNickName(nickname);
+            const author = await this.rootStore.authorsStore.findAuthorByNickName(nickname);
 
             const toSend = new FormData();
             toSend.append('files', name);
@@ -107,11 +107,6 @@ class RefStore {
         } catch (err: any) {
             throw Error(`addToCollection: ${err.message}`);
         }
-    };
-
-    findAuthorByNickName = async (nick: string) => {
-        await this.rootStore.userStore.getAuthors();
-        return this.rootStore.userStore.authors.find((author) => author.nickname === nick);
     };
 }
 

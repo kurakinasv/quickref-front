@@ -3,7 +3,7 @@ import { makeAutoObservable } from 'mobx';
 import { headers } from '@config/api';
 import endpoints from '@config/endpoints';
 import RootStore from '@stores/RootStore';
-import { AuthorType, CategoryType, UserInfoType, UserType } from '@typings/api';
+import { CategoryType, UserInfoType, UserType } from '@typings/api';
 import { formUrl } from '@utils/formUrl';
 import { getAuthHeader } from '@utils/getAuthHeader';
 
@@ -14,21 +14,11 @@ class UserStore {
 
     private _user = {} as UserType;
     private _userId: number | null = null;
-    private _author: AuthorType | null = null;
-    private _authors: AuthorType[] = [];
     private _categories: CategoryType[] = [];
 
     constructor(rootStore: RootStore) {
         makeAutoObservable<this, PrivateFields>(this);
         this.rootStore = rootStore;
-    }
-
-    get author() {
-        return this._author;
-    }
-
-    get authors() {
-        return this._authors;
     }
 
     get token() {
@@ -57,14 +47,6 @@ class UserStore {
 
     setCategories = (categories: CategoryType[]) => {
         this._categories = categories;
-    };
-
-    setAuthor = (author: AuthorType | null) => {
-        this._author = author;
-    };
-
-    setAllAuthors = (authors: AuthorType[]) => {
-        this._authors = authors;
     };
 
     getUser = async () => {
@@ -126,28 +108,6 @@ class UserStore {
             }
         } catch (err: any) {
             throw Error(`editUser: ${err.message}`);
-        }
-    };
-
-    getAuthors = async (id?: number) => {
-        const url = formUrl(endpoints.getAuthors.url);
-
-        try {
-            const response = await fetch(`${url}${id || ''}`, {
-                method: endpoints.getAuthors.method,
-                headers,
-            });
-            const data = await response.json();
-
-            if (data) {
-                if (id) {
-                    this.setAuthor(data);
-                } else {
-                    this.setAllAuthors(data);
-                }
-            }
-        } catch (err: any) {
-            throw Error(`getAuthors: ${err.message}`);
         }
     };
 
