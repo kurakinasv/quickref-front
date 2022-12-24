@@ -21,12 +21,16 @@ import {
 
 const CollectionPage: FC = () => {
     const { getAuthors, author } = useUserStore();
-    const { favImages, getCollection } = useCollectionStore();
+    const { favImages, getCollection, editCollection, description } = useCollectionStore();
     const { allRefs } = useRefStore();
 
     useEffect(() => {
         getCollection();
     }, []);
+
+    useEffect(() => {
+        setTempValue(description);
+    }, [description]);
 
     const { open, openModal, closeModal } = useModal();
 
@@ -55,16 +59,14 @@ const CollectionPage: FC = () => {
         openModal();
     };
 
-    const [tempValue, setTempValue] = useState('');
-    const [value, setValue] = useState('');
+    const [tempValue, setTempValue] = useState(description);
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         setTempValue(event.target.value);
     };
 
-    const blurHandler = () => {
-        setValue(tempValue);
-        console.log('saved', value);
+    const blurHandler = async () => {
+        await editCollection(tempValue);
     };
 
     return (

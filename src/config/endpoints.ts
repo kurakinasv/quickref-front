@@ -52,6 +52,10 @@ const endpoints = {
         method: HttpMetods.GET,
         url: '/collection/',
     },
+    editCollection: {
+        method: HttpMetods.POST,
+        url: '/collection/edit',
+    },
 
     // authors
     getAuthors: {
