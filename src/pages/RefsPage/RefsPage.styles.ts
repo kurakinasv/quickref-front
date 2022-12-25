@@ -6,6 +6,7 @@ import { colors, rgbValues } from '@styles/colors';
 import { styled as muiStyled } from '@mui/material/styles';
 
 const headerHeight = '70px';
+const footerHeight = '120px';
 
 export const Header = styled.header`
     width: 100%;
@@ -42,7 +43,7 @@ export const Timer = styled.div`
 `;
 
 export const Content = styled.main`
-    height: calc(100vh - ${headerHeight});
+    height: calc(100vh - ${headerHeight} - ${footerHeight});
     display: flex;
     align-items: center;
     justify-content: center;
@@ -50,7 +51,7 @@ export const Content = styled.main`
 
 export const RefImage = styled.img`
     max-width: 90vw;
-    max-height: calc(100vh - ${headerHeight});
+    max-height: calc(100vh - ${headerHeight} - ${footerHeight});
 
     width: fit-content;
     height: fit-content;
@@ -60,8 +61,8 @@ export const RefImage = styled.img`
 
 export const Footer = styled.footer`
     width: 100%;
-    height: 120px;
-    padding: 0 10vw;
+    height: ${footerHeight};
+    padding: 0 30vw;
 
     position: fixed;
     bottom: 0;

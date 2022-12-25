@@ -1,44 +1,42 @@
 import { useEffect, useRef, useState } from 'react';
 
-import refs from '@img/refs';
-
-const useTimer = () => {
+const useTimer = (imageAmount: number) => {
     const initialSeconds = 0;
     const initialMinutes = 2;
 
     const timerRef = useRef<NodeJS.Timer | null>(null);
     const isSessionEnd = useRef(false);
 
-    const imageAmount = Object.keys(refs).length;
-
     const [seconds, setSeconds] = useState(initialSeconds);
     const [minutes, setMinutes] = useState(initialMinutes);
     const [refNumber, setRefNumber] = useState(0);
+    const [paused, setPaused] = useState(false);
 
     useEffect(() => {
         startTimer();
+        return () => resetTimeout();
     }, []);
 
     useEffect(() => {
         if (minutes === 0 && seconds === 0) {
             setRefNumber((prev) => prev + 1);
-        }
-
-        return () => {
             stopTimer();
-        };
+        }
     }, [minutes === 0 && seconds === 0]);
 
     const startTimer = () => {
-        if (timerRef.current && !isSessionEnd.current) {
-            tick();
-            return;
-        }
+        resetTimeout();
 
-        if (!timerRef.current && !isSessionEnd.current) {
-            timerRef.current = setTimeout(() => {
-                tick();
-            }, 1000);
+        timerRef.current = setTimeout(() => {
+            setSeconds((s) => (s <= 0 ? 59 : s - 1));
+            startTimer();
+        }, 1000);
+    };
+
+    const resetTimeout = () => {
+        if (timerRef.current) {
+            clearTimeout(timerRef.current);
+            timerRef.current = null;
         }
     };
 
@@ -48,14 +46,6 @@ const useTimer = () => {
         }
     }, [seconds]);
 
-    const tick = () => {
-        setSeconds((s) => (s === 0 ? 59 : s - 1));
-
-        setTimeout(() => {
-            startTimer();
-        }, 1000);
-    };
-
     const stopTimer = () => {
         setSeconds(initialSeconds);
         setMinutes(initialMinutes);
@@ -64,13 +54,22 @@ const useTimer = () => {
             isSessionEnd.current = true;
         }
 
-        if (timerRef.current && isSessionEnd.current) {
-            clearTimeout(timerRef.current);
-            timerRef.current = null;
+        if (isSessionEnd.current) {
+            resetTimeout();
         }
     };
 
-    return { seconds, minutes, refNumber, startTimer, stopTimer, setRefNumber };
+    const pauseTimer = () => {
+        if (!paused) {
+            resetTimeout();
+            setPaused(true);
+        } else {
+            startTimer();
+            setPaused(false);
+        }
+    };
+
+    return { seconds, minutes, refNumber, paused, startTimer, stopTimer, setRefNumber, pauseTimer };
 };
 
 export default useTimer;

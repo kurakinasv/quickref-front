@@ -5,7 +5,14 @@ import { observer } from 'mobx-react-lite';
 
 import { BASE_URL } from '@config/api';
 import useModal from '@hooks/useModal';
-import { ArrowLeft, ArrowRight, Close, InfoOutlined } from '@mui/icons-material';
+import {
+    ArrowBackRounded,
+    ArrowForwardRounded,
+    Close,
+    InfoOutlined,
+    PauseRounded,
+    PlayArrowRounded,
+} from '@mui/icons-material';
 import { Box, Button, IconButton, Modal } from '@mui/material';
 import { PathsEnum } from '@pages/Router';
 import {
@@ -83,7 +90,8 @@ const RefsPage: FC<RefsPageProps> = () => {
         closeModal: closeCollectionsModal,
     } = useModal();
 
-    const { stopTimer, seconds, minutes, refNumber, setRefNumber } = useTimer();
+    const { stopTimer, seconds, minutes, refNumber, setRefNumber, pauseTimer, paused } =
+        useTimer(imageAmount);
 
     const nextImageNumber = (imgAmount: number) => {
         return currentImageNum === imgAmount - 1 ? 0 : currentImageNum + 1;
@@ -209,17 +217,17 @@ const RefsPage: FC<RefsPageProps> = () => {
                     onClick={handleChangeRefClick(ArrowDirection.prev)}
                     disabled={currentImageNum === 0}
                 >
-                    <ArrowLeft />
+                    <ArrowBackRounded />
                 </IconButton>
-                {/* <IconButton size="large" onClick={isPaused ? handleContinue : handlePause}>
-                    {isPaused ? <PlayArrow /> : <Pause />}
-                </IconButton> */}
+                <IconButton size="large" onClick={pauseTimer}>
+                    {paused ? <PlayArrowRounded /> : <PauseRounded />}
+                </IconButton>
                 <IconButton
                     size="large"
                     onClick={handleChangeRefClick(ArrowDirection.next)}
                     disabled={currentImageNum === imageAmount - 1 || !imageAmount}
                 >
-                    <ArrowRight />
+                    <ArrowForwardRounded />
                 </IconButton>
             </Footer>
 
