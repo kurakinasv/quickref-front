@@ -128,7 +128,6 @@ export const ImageBlock = styled.div`
     margin: 20px 0;
 
     display: flex;
-    justify-content: space-between;
     flex-wrap: wrap;
     row-gap: 40px;
 `;
@@ -136,23 +135,28 @@ export const ImageBlock = styled.div`
 export const ImageButton = styled.div<{ imgUrl: string; isActive: boolean }>`
     max-height: 200px;
     flex-basis: 23%;
+    margin: 0 10px;
 
     background-image: ${({ imgUrl }) => (imgUrl ? `url(${imgUrl})` : 'none')};
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
+    border-radius: 8px;
 
     aspect-ratio: 2/3;
     object-fit: fill;
 
     cursor: pointer;
 
-    ${({ isActive }) =>
-        isActive &&
-        css`
-            border: 4px dashed ${colors.peach};
-            border-radius: 8px;
-        `}
+    border: ${({ isActive }) => (isActive ? `4px dashed ${colors.peach}` : 'none')};
+
+    &:nth-child(4n) {
+        margin-right: 0px;
+    }
+
+    &:nth-child(4n + 1) {
+        margin-left: 0px;
+    }
 `;
 
 export const ButtonsBlock = styled.div`

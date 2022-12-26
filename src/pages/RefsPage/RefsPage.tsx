@@ -301,7 +301,7 @@ const RefsPage: FC<RefsPageProps> = () => {
             {isAuthenticated && (
                 <Modal open={collectionsOpen} onClose={closeCollectionsModal}>
                     <>
-                        <Box sx={{ ...modalBoxStyle, width: '900px', padding: '42px' }}>
+                        <Box sx={{ ...modalBoxStyle, width: '834px', padding: '42px' }}>
                             <ModalTitle>Добавить в избранное</ModalTitle>
                             <IconButton
                                 size="large"
