@@ -134,8 +134,12 @@ const CollectionPage: FC = () => {
         }
 
         if (searchValue && category) {
-            filteredImg = filtered.filter(({ authorId }) =>
-                authorId ? authorsIds.includes(authorId) : null
+            filteredImg = favImages.filter((image) =>
+                image.authorId && authorsIds.includes(image.authorId) ? image : null
+            );
+
+            filteredImg = filteredImg.filter(
+                ({ categoryId }) => categoryId === Number(category) + 1
             );
         }
 
