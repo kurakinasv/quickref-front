@@ -108,6 +108,25 @@ class RefStore {
             throw Error(`addToCollection: ${err.message}`);
         }
     };
+
+    removeFromCollection = async (imageId: number, collectionId?: number) => {
+        const url = formUrl(endpoints.removeFromCollection.url);
+
+        try {
+            const response = await fetch(url, {
+                method: endpoints.removeFromCollection.method,
+                body: JSON.stringify({ id: imageId, collectionId }),
+                headers: { ...headers, ...getAuthHeader(this.token) },
+            });
+            const data = await response.json();
+
+            if (data) {
+                await this.rootStore.collectionStore.getCollection();
+            }
+        } catch (err: any) {
+            throw Error(`addToCollection: ${err.message}`);
+        }
+    };
 }
 
 export default RefStore;

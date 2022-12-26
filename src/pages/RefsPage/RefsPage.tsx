@@ -1,4 +1,4 @@
-import React, { FC, MouseEvent, useEffect, useState } from 'react';
+import React, { FC, MouseEvent, useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
@@ -12,6 +12,8 @@ import {
     InfoOutlined,
     PauseRounded,
     PlayArrowRounded,
+    StarOutlineRounded,
+    StarRounded,
 } from '@mui/icons-material';
 import { Box, Button, IconButton, Modal } from '@mui/material';
 import { PathsEnum } from '@pages/Router';
@@ -22,7 +24,6 @@ import {
     useRefStore,
 } from '@stores/RootStore/hooks';
 import { modalBoxStyle } from '@styles/consts';
-import { RefType } from '@typings/api';
 import useTimer from './useTimer';
 
 import {
@@ -56,22 +57,27 @@ const RefsPage: FC<RefsPageProps> = () => {
 
     const { getAuthors, author, setAuthor } = useAuthorsStore();
     const { isAuthenticated } = useAuthStore();
-    const { setFavourites } = useCollectionStore();
-    const { allRefs, addToCollection } = useRefStore();
+    const { favImages, setFavourites, getCollection } = useCollectionStore();
+    const { allRefs, addToCollection, removeFromCollection, getRefs } = useRefStore();
 
-    const [categoryRefs, setCategoryRefs] = useState<RefType[]>([]);
+    const categoryRefs = useMemo(
+        () => allRefs.filter(({ categoryId }) => categoryId === Number(params.id) + 1),
+        [params.id]
+    );
+
     const [currentImageNum, setCurrentImageNum] = useState(0);
     const [currentRef, setCurrentRef] = useState(categoryRefs[currentImageNum]);
 
-    const [imageAmount, setImageAmount] = useState(0);
+    const imageAmount = useMemo(() => categoryRefs.length, [categoryRefs.length]);
+
+    const init = async () => {
+        await getCollection();
+        await getRefs();
+    };
 
     useEffect(() => {
-        const imgs = allRefs.filter(({ categoryId }) => categoryId === Number(params.id) + 1);
-
-        setCategoryRefs(imgs);
-        setCurrentRef(imgs[0]);
-        setImageAmount(imgs.length);
-    }, [params]);
+        init();
+    }, []);
 
     useEffect(() => {
         if (currentRef && currentRef.authorId) {
@@ -190,6 +196,28 @@ const RefsPage: FC<RefsPageProps> = () => {
         }
     };
 
+    const [inFavs, setInFavs] = useState(false);
+
+    useEffect(() => {
+        if (categoryRefs.length && favImages.length) {
+            setInFavs(!!favImages.find(({ id }) => id === categoryRefs[currentImageNum].id));
+        }
+    }, [currentImageNum, favImages.length, categoryRefs.length]);
+
+    const addToFavourites = async () => {
+        const currentImgId = categoryRefs[currentImageNum]?.id;
+
+        // check if image is already in favImages
+        if (inFavs) {
+            await removeFromCollection(currentImgId);
+            setInFavs(false);
+            return;
+        }
+
+        await addToCollection(currentImgId);
+        setInFavs(true);
+    };
+
     return (
         <>
             <Header>
@@ -200,6 +228,14 @@ const RefsPage: FC<RefsPageProps> = () => {
                         {minutes}:{seconds < 10 ? '0' : ''}
                         {seconds}
                     </Timer>
+                    <IconButton
+                        size="large"
+                        sx={{ mr: 1 }}
+                        onClick={addToFavourites}
+                        title="Добавить в избранное"
+                    >
+                        {inFavs ? <StarRounded /> : <StarOutlineRounded />}
+                    </IconButton>
                     <IconButton size="large" sx={{ mr: 1 }} onClick={openModal}>
                         <InfoOutlined />
                     </IconButton>

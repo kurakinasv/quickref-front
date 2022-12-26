@@ -59,7 +59,7 @@ class CollectionStore {
     };
 
     getCollection = async (id?: number) => {
-        const url = formUrl(`${endpoints.getCollections.url}/${id || 'fav'}`);
+        const url = formUrl(`${endpoints.getCollections.url}${id || 'fav'}`);
 
         try {
             const response = await fetch(url, {

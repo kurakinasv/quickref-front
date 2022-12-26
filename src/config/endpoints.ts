@@ -46,6 +46,10 @@ const endpoints = {
         method: HttpMetods.POST,
         url: '/image/add',
     },
+    removeFromCollection: {
+        method: HttpMetods.DELETE,
+        url: '/image/remove',
+    },
 
     // colllections
     getCollections: {

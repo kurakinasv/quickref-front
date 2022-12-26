@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite';
 import { BASE_URL } from '@config/api';
 import { categoriesInfo } from '@config/categories';
 import useModal from '@hooks/useModal';
-import { Close } from '@mui/icons-material';
+import { Close, DeleteRounded } from '@mui/icons-material';
 import {
     Box,
     FormControl,
@@ -18,7 +18,7 @@ import {
     SelectChangeEvent,
     TextField,
 } from '@mui/material';
-import { useAuthorsStore, useCollectionStore } from '@stores/RootStore/hooks';
+import { useAuthorsStore, useCollectionStore, useRefStore } from '@stores/RootStore/hooks';
 import { modalBoxStyle } from '@styles/consts';
 import { RefType } from '@typings/api';
 
@@ -36,6 +36,7 @@ import {
 const CollectionPage: FC = () => {
     const { getAuthors, authors } = useAuthorsStore();
     const { favImages, getCollection, editCollection, description } = useCollectionStore();
+    const { removeFromCollection } = useRefStore();
 
     useEffect(() => {
         getCollection();
@@ -139,6 +140,16 @@ const CollectionPage: FC = () => {
         setFiltered(filteredImg);
     };
 
+    const removeImageFromCollection = async (e: React.SyntheticEvent<HTMLButtonElement>) => {
+        e.stopPropagation();
+
+        const id = e.currentTarget.dataset.imageid;
+
+        if (id) {
+            await removeFromCollection(Number(id));
+        }
+    };
+
     return (
         <>
             <Content>
@@ -189,14 +200,23 @@ const CollectionPage: FC = () => {
                 </FilterBlock>
 
                 <Grid container columns={5} rowSpacing={2} columnSpacing={{ xs: 2, md: 2 }}>
-                    {filtered.map(({ name }, id) => {
+                    {filtered.map(({ name, id: imageId }, id) => {
                         return (
                             <Grid item xs={1} key={name + id} justifyContent="center">
                                 <ImageItem
                                     imgUrl={BASE_URL + name}
                                     data-url={name}
                                     onClick={handleClick}
-                                />
+                                >
+                                    <IconButton
+                                        size="small"
+                                        data-imageid={imageId}
+                                        onClick={removeImageFromCollection}
+                                        sx={{ position: 'absolute', top: '5px', right: '5px' }}
+                                    >
+                                        <DeleteRounded />
+                                    </IconButton>
+                                </ImageItem>
                             </Grid>
                         );
                     })}

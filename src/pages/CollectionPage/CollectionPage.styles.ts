@@ -28,6 +28,8 @@ export const FilterBlock = styled.div`
 `;
 
 export const ImageItem = styled.div<{ imgUrl: string }>`
+    position: relative;
+
     background-image: ${({ imgUrl }) => (imgUrl ? `url(${imgUrl})` : 'none')};
     background-repeat: no-repeat;
     background-size: cover;
@@ -40,6 +42,17 @@ export const ImageItem = styled.div<{ imgUrl: string }>`
 
     cursor: pointer;
     user-select: none;
+
+    & > button {
+        opacity: 0;
+        transition: opacity 0.2s ease-out;
+    }
+
+    :hover {
+        & > button {
+            opacity: 1;
+        }
+    }
 `;
 
 export const ModalTitle = styled.div`
