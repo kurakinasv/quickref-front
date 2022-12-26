@@ -1,7 +1,7 @@
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { Button, InputLabel } from '@mui/material';
-import { colors } from '@styles/colors';
+import { colors, rgbValues } from '@styles/colors';
 
 import { styled as muiStyled } from '@mui/material/styles';
 
@@ -30,7 +30,7 @@ export const Form = styled.div`
     gap: 70px;
 `;
 
-export const UploadImage = styled.div`
+export const UploadImage = styled.div<{ isUpload: boolean }>`
     width: 500px;
     height: 470px;
 
@@ -42,6 +42,18 @@ export const UploadImage = styled.div`
     border-radius: 16px;
 
     cursor: pointer;
+
+    ${({ isUpload }) =>
+        isUpload &&
+        css`
+            border: 4px solid ${colors.peach};
+            background-color: rgba(${rgbValues.peach}, 0.2);
+
+            &,
+            & > label {
+                cursor: default;
+            }
+        `}
 
     & input {
         display: none;

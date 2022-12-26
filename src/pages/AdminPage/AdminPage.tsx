@@ -3,7 +3,7 @@ import React, { FC, useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
 import { categoriesInfo } from '@config/categories';
-import { FileUploadOutlined } from '@mui/icons-material';
+import { DownloadDoneRounded, UploadRounded } from '@mui/icons-material';
 import {
     Alert,
     FormControl,
@@ -92,9 +92,9 @@ const AdminPage: FC = () => {
             <PageTitle>Админ-панель</PageTitle>
 
             <Form>
-                <UploadImage>
+                <UploadImage isUpload={!!image}>
                     <StyledInputLabel htmlFor="file-upload-input">
-                        <FileUploadOutlined />
+                        {image ? <DownloadDoneRounded /> : <UploadRounded />}
                     </StyledInputLabel>
                     <input
                         type="file"
@@ -102,6 +102,7 @@ const AdminPage: FC = () => {
                         accept=".jpg"
                         hidden
                         onChange={onImageChange}
+                        disabled={!!image}
                     />
                 </UploadImage>
 

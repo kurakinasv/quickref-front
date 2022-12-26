@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { Outlet } from 'react-router-dom';
+import React, { useCallback, useState } from 'react';
+import { Outlet, useLocation } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
 
@@ -26,6 +26,16 @@ import {
 } from './MainPage.styles';
 
 const MainPage = () => {
+    const location = useLocation();
+
+    const isNavLinkActive = useCallback(
+        (page: PathsEnum) => {
+            const path = location.pathname.split('/')[1];
+            return path === page;
+        },
+        [location.pathname]
+    );
+
     const { isAuthenticated, isAdmin, loginHandler, logoutHandler, registerHandler } =
         useAuthStore();
 
@@ -33,7 +43,7 @@ const MainPage = () => {
 
     const { open, openModal, closeModal } = useModal();
 
-    const [value, setValue] = useState({ email: '', password: '' });
+    const [value, setValue] = useState({ email: 'admin@qwe.com', password: '12345qwe' });
 
     const handleChange = (event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>) => {
         const { name, value } = event.target;
@@ -58,9 +68,24 @@ const MainPage = () => {
                     <NavBar>
                         {isAuthenticated && (
                             <>
-                                {isAdmin && <NavLink to={PathsEnum.admin}>Админ-панель</NavLink>}
-                                <NavLink to={PathsEnum.profile}>Профиль</NavLink>
-                                <NavLink to={`${PathsEnum.collection}/${collections[0].id}`}>
+                                {isAdmin && (
+                                    <NavLink
+                                        to={PathsEnum.admin}
+                                        isActive={isNavLinkActive(PathsEnum.admin)}
+                                    >
+                                        Админ-панель
+                                    </NavLink>
+                                )}
+                                <NavLink
+                                    to={PathsEnum.profile}
+                                    isActive={isNavLinkActive(PathsEnum.profile)}
+                                >
+                                    Профиль
+                                </NavLink>
+                                <NavLink
+                                    to={`${PathsEnum.collection}/${collections[0].id}`}
+                                    isActive={isNavLinkActive(PathsEnum.collection)}
+                                >
                                     Избранное
                                 </NavLink>
                                 <LinkButton onClick={logoutHandler}>Выйти</LinkButton>

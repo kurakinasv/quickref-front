@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 
 import { colors } from '@styles/colors';
 
@@ -40,7 +40,9 @@ export const NavBar = styled.nav`
     gap: 30px;
 `;
 
-export const NavLink = styled(Link)`
+export const NavLink = styled(Link)<{ isActive: boolean }>`
+    position: relative;
+
     color: ${colors.darkBrown};
     font-size: 16px;
     font-weight: 500;
@@ -49,6 +51,30 @@ export const NavLink = styled(Link)`
     :hover {
         text-decoration: underline;
         cursor: pointer;
+    }
+
+    ${({ isActive }) =>
+        isActive &&
+        css`
+            border-bottom: 2px solid ${colors.darkBrown};
+
+            :hover {
+                text-decoration: none;
+                cursor: default;
+            }
+            &::after {
+                display: block;
+            }
+        `}
+
+    &::after {
+        content: '';
+        display: none;
+
+        width: auto;
+        height: 2px;
+
+        background-color: ${colors.darkBrown};
     }
 `;
 
