@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { observer } from 'mobx-react-lite';
 
@@ -6,6 +6,7 @@ import { categoriesInfo } from '@config/categories';
 import { DownloadDoneRounded, UploadRounded } from '@mui/icons-material';
 import {
     Alert,
+    Autocomplete,
     FormControl,
     InputLabel,
     MenuItem,
@@ -13,8 +14,9 @@ import {
     Select,
     SelectChangeEvent,
     Snackbar,
+    TextField,
 } from '@mui/material';
-import { useMeta, useRefStore } from '@stores/RootStore/hooks';
+import { useAuthorsStore, useMeta, useRefStore } from '@stores/RootStore/hooks';
 
 import {
     Content,
@@ -31,6 +33,11 @@ import {
 const AdminPage: FC = () => {
     const { uploadImage } = useRefStore();
     const { isError } = useMeta();
+    const { authors, getAuthors } = useAuthorsStore();
+
+    useEffect(() => {
+        getAuthors();
+    }, []);
 
     const [value, setValue] = useState({
         source: '',
@@ -61,6 +68,10 @@ const AdminPage: FC = () => {
         setValue((val) => ({ ...val, [name]: value }));
     };
 
+    const handleAutocomplete = (event: React.SyntheticEvent, value: string, reason: string) => {
+        setValue((val) => ({ ...val, ['nickname']: value }));
+    };
+
     const [category, setCategory] = useState('');
 
     const onSelectChange = (event: SelectChangeEvent) => {
@@ -85,7 +96,10 @@ const AdminPage: FC = () => {
 
         setValue(newValues);
         setCategory('');
+        setImage(null);
     };
+
+    const allNickNames = useMemo(() => authors.map(({ nickname }) => nickname), [authors]);
 
     return (
         <Content>
@@ -142,13 +156,24 @@ const AdminPage: FC = () => {
 
                     <InfoPanelItem>
                         <SubTitle>Автор</SubTitle>
-                        <OutlinedInput
-                            fullWidth={true}
+                        <Autocomplete
+                            freeSolo
+                            disableClearable
+                            options={allNickNames}
                             size="small"
-                            placeholder="Никнейм"
-                            name="nickname"
-                            onChange={handleChange}
+                            onChange={handleAutocomplete}
                             value={value.nickname}
+                            renderInput={(params) => (
+                                <TextField
+                                    {...params}
+                                    name="nickname"
+                                    label="Никнейм"
+                                    InputProps={{
+                                        ...params.InputProps,
+                                        type: 'search',
+                                    }}
+                                />
+                            )}
                         />
                     </InfoPanelItem>
                 </InfoPanel>
