@@ -2,8 +2,10 @@ import React, { FC, useEffect, useMemo, useState } from 'react';
 
 import { observer } from 'mobx-react-lite';
 
+import AlertMessage from '@components/AlertMessage';
 import { BASE_URL } from '@config/api';
 import { categoriesInfo } from '@config/categories';
+import useAlert from '@hooks/useAlert';
 import useModal from '@hooks/useModal';
 import { Close, DeleteRounded } from '@mui/icons-material';
 import {
@@ -140,6 +142,8 @@ const CollectionPage: FC = () => {
         setFiltered(filteredImg);
     };
 
+    const { status, handleAlert } = useAlert();
+
     const removeImageFromCollection = async (e: React.SyntheticEvent<HTMLButtonElement>) => {
         e.stopPropagation();
 
@@ -147,6 +151,7 @@ const CollectionPage: FC = () => {
 
         if (id) {
             await removeFromCollection(Number(id));
+            handleAlert('Удалено из коллекции');
         }
     };
 
@@ -247,6 +252,8 @@ const CollectionPage: FC = () => {
                     </Box>
                 </>
             </Modal>
+
+            {status && <AlertMessage key={status.key} message={status.msg} />}
         </>
     );
 };

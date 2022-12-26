@@ -3,7 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 
 import { observer } from 'mobx-react-lite';
 
+import AlertMessage from '@components/AlertMessage';
 import { BASE_URL } from '@config/api';
+import useAlert from '@hooks/useAlert';
 import useModal from '@hooks/useModal';
 import {
     ArrowBackRounded,
@@ -204,6 +206,8 @@ const RefsPage: FC<RefsPageProps> = () => {
         }
     }, [currentImageNum, favImages.length, categoryRefs.length]);
 
+    const { status, handleAlert } = useAlert();
+
     const addToFavourites = async () => {
         const currentImgId = categoryRefs[currentImageNum]?.id;
 
@@ -211,11 +215,13 @@ const RefsPage: FC<RefsPageProps> = () => {
         if (inFavs) {
             await removeFromCollection(currentImgId);
             setInFavs(false);
+            handleAlert('Удалено из избранного');
             return;
         }
 
         await addToCollection(currentImgId);
         setInFavs(true);
+        handleAlert('Добавлено в избранное');
     };
 
     return (
@@ -232,7 +238,7 @@ const RefsPage: FC<RefsPageProps> = () => {
                         size="large"
                         sx={{ mr: 1 }}
                         onClick={addToFavourites}
-                        title="Добавить в избранное"
+                        title={inFavs ? 'Убрать из избранного' : 'Добавить в избранное'}
                     >
                         {inFavs ? <StarRounded /> : <StarOutlineRounded />}
                     </IconButton>
@@ -355,6 +361,8 @@ const RefsPage: FC<RefsPageProps> = () => {
                     </>
                 </Modal>
             )}
+
+            {status && <AlertMessage key={status.key} message={status.msg} />}
         </>
     );
 };
